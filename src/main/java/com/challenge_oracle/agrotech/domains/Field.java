@@ -20,7 +20,7 @@ import java.util.UUID;
 
 @Entity
 @Data
-@Table(name = "properties")
+@Table(name = "fields")
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
