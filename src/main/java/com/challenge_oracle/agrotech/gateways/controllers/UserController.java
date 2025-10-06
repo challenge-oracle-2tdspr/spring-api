@@ -20,8 +20,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
-import static java.util.Optional.empty;
-
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/users")
