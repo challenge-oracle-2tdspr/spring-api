@@ -1,5 +1,6 @@
 package com.challenge_oracle.agrotech.domains;
 
+import com.challenge_oracle.agrotech.enums.SensorStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
