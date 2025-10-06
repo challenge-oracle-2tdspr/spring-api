@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  agrotech-db:
+    image: postgres:15
+    container_name: agrotech_postgres
+    environment:
+      POSTGRES_DB: agrotech
+      POSTGRES_USER: agrotech_user
+      POSTGRES_PASSWORD: agrotech_password
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-scripts:/docker-entrypoint-initdb.d
+    networks:
+      - agrotech-network
+    restart: unless-stopped
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: agrotech_pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@agrotech.com
+      PGLADMIN_DEFAULT_PASSWORD: admin123
+    ports:
+      - "8080:80"
+    depends_on:
+      - agrotech-db
+    networks:
+      - agrotech-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+
+networks:
+  agrotech-network:
+    driver: bridge
