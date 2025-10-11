@@ -1,0 +1,172 @@
+{
+  "info": {
+    "name": "Agrotech API",
+    "description": "Api para gerenciamento de planta\u00e7\u00f5es e safras",
+    "version": "0.1.0",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Users",
+      "description": "User managing endpoints",
+      "item": [
+        {
+          "name": "Fetch all users with pagination",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/users?page=0&size=20",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "users"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0",
+                  "description": "Page number"
+                },
+                {
+                  "key": "size",
+                  "value": "20",
+                  "description": "Page size"
+                }
+              ]
+            },
+            "description": "Fetch all users with pagination"
+          },
+          "response": []
+        },
+        {
+          "name": "Create new user",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"securePassword123\",\n  \"cpf\": \"12345678901\",\n  \"role\": \"USER\",\n  \"firstName\": \"Jo\\u00e3o\",\n  \"lastName\": \"Silva\",\n  \"phoneNumber\": \"+5511999999999\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/users",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "users"
+              ]
+            },
+            "description": "Create new user"
+          },
+          "response": []
+        },
+        {
+          "name": "Fetch one user by its id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/users/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "users",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "550e8400-e29b-41d4-a716-446655440000",
+                  "description": "User UUID"
+                }
+              ]
+            },
+            "description": "Fetch one user by its id"
+          },
+          "response": []
+        },
+        {
+          "name": "Update user",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"updated@example.com\",\n  \"password\": \"newPassword123\",\n  \"cpf\": \"98765432100\",\n  \"role\": \"MANAGER\",\n  \"firstName\": \"Maria\",\n  \"lastName\": \"Santos\",\n  \"phoneNumber\": \"+5511888888888\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/users/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "users",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "550e8400-e29b-41d4-a716-446655440000",
+                  "description": "User UUID"
+                }
+              ]
+            },
+            "description": "Update user"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete user",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/users/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "users",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "550e8400-e29b-41d4-a716-446655440000",
+                  "description": "User UUID"
+                }
+              ]
+            },
+            "description": "Delete user"
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
