@@ -294,3 +294,7 @@ O cronograma do projeto está no dentro do GitHub Projects, no seguinte link:
 https://github.com/orgs/challenge-oracle-2tdspr/projects/1/views/1
 
 O acesso é publico para facilitar visualização.
+
+## Vídeo de apresentação
+
+https://www.youtube.com/watch?v=TwlQuYMBLX0
