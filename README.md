@@ -285,3 +285,16 @@ Para contribuir com o projeto:
 3. Commit suas mudanças (`git commit -m 'feat: add new functionality'`)
 4. Push para a branch (`git push origin feat/username/nova-funcionalidade`)
 5. Abra um Pull Request
+
+
+## Cronograma
+
+O cronograma do projeto está no dentro do GitHub Projects, no seguinte link:
+
+https://github.com/orgs/challenge-oracle-2tdspr/projects/1/views/1
+
+O acesso é publico para facilitar visualização.
+
+## Vídeo de apresentação
+
+https://www.youtube.com/watch?v=TwlQuYMBLX0
