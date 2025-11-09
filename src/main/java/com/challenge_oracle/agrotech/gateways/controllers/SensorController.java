@@ -1,5 +1,6 @@
 package com.challenge_oracle.agrotech.gateways.controllers;
 
+import com.challenge_oracle.agrotech.assemblers.SensorModelAssembler;
 import com.challenge_oracle.agrotech.enums.SensorStatus;
 import com.challenge_oracle.agrotech.gateways.requests.SensorCreateRequestDTO;
 import com.challenge_oracle.agrotech.gateways.requests.SensorUpdateRequestDTO;
@@ -15,6 +16,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -28,6 +31,7 @@ import java.util.UUID;
 public class SensorController {
 
     private final SensorService sensorService;
+    private final SensorModelAssembler sensorModelAssembler;
 
     @PostMapping
     @Operation(summary = "Create new sensor")
@@ -44,7 +48,7 @@ public class SensorController {
             SensorCreateRequestDTO dto
     ) {
         SensorResponseDTO sensor = sensorService.createSensor(dto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(sensor);
+        return ResponseEntity.status(HttpStatus.CREATED).body(sensorModelAssembler.toModel(sensor));
     }
 
     @GetMapping
@@ -54,13 +58,16 @@ public class SensorController {
             @ApiResponse(responseCode = "400", description = "Invalid pagination parameters", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
-    public ResponseEntity<Page<SensorResponseDTO>> getAllSensors(
+    public ResponseEntity<PagedModel<SensorResponseDTO>> getAllSensors(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size
+            @RequestParam(defaultValue = "20") int size,
+            PagedResourcesAssembler<SensorResponseDTO> pagedAssembler
     ) {
         Pageable pageable = PageRequest.of(page, size);
         Page<SensorResponseDTO> sensors = sensorService.getAllSensors(pageable);
-        return ResponseEntity.ok(sensors);
+
+        PagedModel<SensorResponseDTO> pagedModel = pagedAssembler.toModel(sensors, sensorModelAssembler);
+        return ResponseEntity.ok(pagedModel);
     }
 
     @GetMapping("/field/{fieldId}")
@@ -71,14 +78,17 @@ public class SensorController {
             @ApiResponse(responseCode = "404", description = "Field not found", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
-    public ResponseEntity<Page<SensorResponseDTO>> getSensorsByField(
+    public ResponseEntity<PagedModel<SensorResponseDTO>> getSensorsByField(
             @PathVariable UUID fieldId,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size
+            @RequestParam(defaultValue = "20") int size,
+            PagedResourcesAssembler<SensorResponseDTO> pagedAssembler
     ) {
         Pageable pageable = PageRequest.of(page, size);
         Page<SensorResponseDTO> sensors = sensorService.getSensorsByField(fieldId, pageable);
-        return ResponseEntity.ok(sensors);
+
+        PagedModel<SensorResponseDTO> pagedModel = pagedAssembler.toModel(sensors, sensorModelAssembler);
+        return ResponseEntity.ok(pagedModel);
     }
 
     @GetMapping("/status/{status}")
@@ -88,14 +98,17 @@ public class SensorController {
             @ApiResponse(responseCode = "400", description = "Invalid status or pagination parameters", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
-    public ResponseEntity<Page<SensorResponseDTO>> getSensorsByStatus(
+    public ResponseEntity<PagedModel<SensorResponseDTO>> getSensorsByStatus(
             @PathVariable SensorStatus status,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size
+            @RequestParam(defaultValue = "20") int size,
+            PagedResourcesAssembler<SensorResponseDTO> pagedAssembler
     ) {
         Pageable pageable = PageRequest.of(page, size);
         Page<SensorResponseDTO> sensors = sensorService.getSensorsByStatus(status, pageable);
-        return ResponseEntity.ok(sensors);
+
+        PagedModel<SensorResponseDTO> pagedModel = pagedAssembler.toModel(sensors, sensorModelAssembler);
+        return ResponseEntity.ok(pagedModel);
     }
 
     @GetMapping("/{id}")
@@ -108,7 +121,7 @@ public class SensorController {
     })
     public ResponseEntity<SensorResponseDTO> getSensorById(@PathVariable UUID id) {
         SensorResponseDTO sensor = sensorService.getSensorById(id);
-        return ResponseEntity.ok(sensor);
+        return ResponseEntity.ok(sensorModelAssembler.toModel(sensor));
     }
 
     @GetMapping("/code/{sensorCode}")
@@ -120,7 +133,7 @@ public class SensorController {
     })
     public ResponseEntity<SensorResponseDTO> getSensorBySensorCode(@PathVariable String sensorCode) {
         SensorResponseDTO sensor = sensorService.getSensorBySensorCode(sensorCode);
-        return ResponseEntity.ok(sensor);
+        return ResponseEntity.ok(sensorModelAssembler.toModel(sensor));
     }
 
     @PutMapping("/{id}")
@@ -139,7 +152,7 @@ public class SensorController {
             SensorUpdateRequestDTO dto
     ) {
         SensorResponseDTO sensor = sensorService.updateSensor(id, dto);
-        return ResponseEntity.ok(sensor);
+        return ResponseEntity.ok(sensorModelAssembler.toModel(sensor));
     }
 
     @DeleteMapping("/{id}")

@@ -1,5 +1,6 @@
 package com.challenge_oracle.agrotech.gateways.controllers;
 
+import com.challenge_oracle.agrotech.assemblers.PropertyModelAssembler;
 import com.challenge_oracle.agrotech.gateways.requests.PropertyCreateRequestDTO;
 import com.challenge_oracle.agrotech.gateways.requests.PropertyUpdateRequestDTO;
 import com.challenge_oracle.agrotech.gateways.responses.PropertyResponseDTO;
@@ -15,6 +16,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -28,6 +31,7 @@ import java.util.UUID;
 public class PropertyController {
 
     private final PropertyService propertyService;
+    private final PropertyModelAssembler propertyModelAssembler;
 
     @PostMapping
     @Operation(summary = "Create new property")
@@ -44,7 +48,7 @@ public class PropertyController {
             PropertyCreateRequestDTO dto
     ) {
         PropertyResponseDTO property = propertyService.createProperty(dto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(property);
+        return ResponseEntity.status(HttpStatus.CREATED).body(propertyModelAssembler.toModel(property));
     }
 
     @GetMapping
@@ -54,18 +58,21 @@ public class PropertyController {
             @ApiResponse(responseCode = "400", description = "Invalid pagination parameters", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
-    public ResponseEntity<Page<PropertyResponseDTO>> getAllProperties(
+    public ResponseEntity<PagedModel<PropertyResponseDTO>> getAllProperties(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "createdAt") String sortBy,
-            @RequestParam(defaultValue = "DESC") String sortDirection
+            @RequestParam(defaultValue = "DESC") String sortDirection,
+            PagedResourcesAssembler<PropertyResponseDTO> pagedAssembler
     ) {
         Sort.Direction direction = sortDirection.equalsIgnoreCase("ASC")
                 ? Sort.Direction.ASC
                 : Sort.Direction.DESC;
         Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
         Page<PropertyResponseDTO> properties = propertyService.getAllProperties(pageable);
-        return ResponseEntity.ok(properties);
+
+        PagedModel<PropertyResponseDTO> pagedModel = pagedAssembler.toModel(properties, propertyModelAssembler);
+        return ResponseEntity.ok(pagedModel);
     }
 
     @GetMapping("/{id}")
@@ -78,7 +85,7 @@ public class PropertyController {
     })
     public ResponseEntity<PropertyResponseDTO> getPropertyById(@PathVariable UUID id) {
         PropertyResponseDTO property = propertyService.getPropertyById(id);
-        return ResponseEntity.ok(property);
+        return ResponseEntity.ok(propertyModelAssembler.toModel(property));
     }
 
     @PutMapping("/{id}")
@@ -97,7 +104,7 @@ public class PropertyController {
             PropertyUpdateRequestDTO dto
     ) {
         PropertyResponseDTO property = propertyService.updateProperty(id, dto);
-        return ResponseEntity.ok(property);
+        return ResponseEntity.ok(propertyModelAssembler.toModel(property));
     }
 
     @DeleteMapping("/{id}")
