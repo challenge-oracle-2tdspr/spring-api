@@ -1,5 +1,6 @@
 package com.challenge_oracle.agrotech.gateways.controllers;
 
+import com.challenge_oracle.agrotech.assemblers.SensorReadingModelAssembler;
 import com.challenge_oracle.agrotech.gateways.requests.SensorReadingCreateRequestDTO;
 import com.challenge_oracle.agrotech.gateways.requests.SensorReadingUpdateRequestDTO;
 import com.challenge_oracle.agrotech.gateways.responses.SensorReadingResponseDTO;
@@ -14,7 +15,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -29,6 +32,7 @@ import java.util.UUID;
 public class SensorReadingController {
 
     private final SensorReadingService sensorReadingService;
+    private final SensorReadingModelAssembler sensorReadingModelAssembler;
 
     @PostMapping
     @Operation(summary = "Create new sensor reading")
@@ -44,7 +48,7 @@ public class SensorReadingController {
             SensorReadingCreateRequestDTO dto
     ) {
         SensorReadingResponseDTO reading = sensorReadingService.createSensorReading(dto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(reading);
+        return ResponseEntity.status(HttpStatus.CREATED).body(sensorReadingModelAssembler.toModel(reading));
     }
 
     @GetMapping
@@ -54,13 +58,16 @@ public class SensorReadingController {
             @ApiResponse(responseCode = "400", description = "Invalid pagination parameters", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
-    public ResponseEntity<Page<SensorReadingResponseDTO>> getAllSensorReadings(
+    public ResponseEntity<PagedModel<SensorReadingResponseDTO>> getAllSensorReadings(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size
+            @RequestParam(defaultValue = "20") int size,
+            PagedResourcesAssembler<SensorReadingResponseDTO> pagedAssembler
     ) {
         Pageable pageable = PageRequest.of(page, size);
         Page<SensorReadingResponseDTO> readings = sensorReadingService.getAllSensorReadings(pageable);
-        return ResponseEntity.ok(readings);
+
+        PagedModel<SensorReadingResponseDTO> pagedModel = pagedAssembler.toModel(readings, sensorReadingModelAssembler);
+        return ResponseEntity.ok(pagedModel);
     }
 
     @GetMapping("/sensor/{sensorId}")
@@ -71,14 +78,17 @@ public class SensorReadingController {
             @ApiResponse(responseCode = "404", description = "Sensor not found", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
-    public ResponseEntity<Page<SensorReadingResponseDTO>> getReadingsBySensor(
+    public ResponseEntity<PagedModel<SensorReadingResponseDTO>> getReadingsBySensor(
             @PathVariable UUID sensorId,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size
+            @RequestParam(defaultValue = "20") int size,
+            PagedResourcesAssembler<SensorReadingResponseDTO> pagedAssembler
     ) {
         Pageable pageable = PageRequest.of(page, size);
         Page<SensorReadingResponseDTO> readings = sensorReadingService.getReadingsBySensor(sensorId, pageable);
-        return ResponseEntity.ok(readings);
+
+        PagedModel<SensorReadingResponseDTO> pagedModel = pagedAssembler.toModel(readings, sensorReadingModelAssembler);
+        return ResponseEntity.ok(pagedModel);
     }
 
     @GetMapping("/sensor/{sensorId}/range")
@@ -89,12 +99,13 @@ public class SensorReadingController {
             @ApiResponse(responseCode = "404", description = "Sensor not found", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
-    public ResponseEntity<Page<SensorReadingResponseDTO>> getReadingsBySensorAndDateRange(
+    public ResponseEntity<PagedModel<SensorReadingResponseDTO>> getReadingsBySensorAndDateRange(
             @PathVariable UUID sensorId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startTime,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endTime,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size
+            @RequestParam(defaultValue = "20") int size,
+            PagedResourcesAssembler<SensorReadingResponseDTO> pagedAssembler
     ) {
         Pageable pageable = PageRequest.of(page, size);
         Page<SensorReadingResponseDTO> readings = sensorReadingService.getReadingsBySensorAndDateRange(
@@ -103,7 +114,9 @@ public class SensorReadingController {
                 endTime,
                 pageable
         );
-        return ResponseEntity.ok(readings);
+
+        PagedModel<SensorReadingResponseDTO> pagedModel = pagedAssembler.toModel(readings, sensorReadingModelAssembler);
+        return ResponseEntity.ok(pagedModel);
     }
 
     @GetMapping("/{id}")
@@ -116,7 +129,7 @@ public class SensorReadingController {
     })
     public ResponseEntity<SensorReadingResponseDTO> getReadingById(@PathVariable UUID id) {
         SensorReadingResponseDTO reading = sensorReadingService.getReadingById(id);
-        return ResponseEntity.ok(reading);
+        return ResponseEntity.ok(sensorReadingModelAssembler.toModel(reading));
     }
 
     @PutMapping("/{id}")
@@ -134,7 +147,7 @@ public class SensorReadingController {
             SensorReadingUpdateRequestDTO dto
     ) {
         SensorReadingResponseDTO reading = sensorReadingService.updateReading(id, dto);
-        return ResponseEntity.ok(reading);
+        return ResponseEntity.ok(sensorReadingModelAssembler.toModel(reading));
     }
 
     @DeleteMapping("/{id}")

@@ -1,5 +1,6 @@
 package com.challenge_oracle.agrotech.gateways.controllers;
 
+import com.challenge_oracle.agrotech.assemblers.FieldModelAssembler;
 import com.challenge_oracle.agrotech.gateways.requests.FieldCreateRequestDTO;
 import com.challenge_oracle.agrotech.gateways.requests.FieldUpdateRequestDTO;
 import com.challenge_oracle.agrotech.gateways.responses.FieldResponseDTO;
@@ -14,6 +15,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,6 +30,7 @@ import java.util.UUID;
 public class FieldController {
 
     private final FieldService fieldService;
+    private final FieldModelAssembler fieldModelAssembler;
 
     @PostMapping
     @Operation(summary = "Create new field")
@@ -43,7 +47,7 @@ public class FieldController {
             FieldCreateRequestDTO dto
     ) {
         FieldResponseDTO field = fieldService.createField(dto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(field);
+        return ResponseEntity.status(HttpStatus.CREATED).body(fieldModelAssembler.toModel(field));
     }
 
     @GetMapping
@@ -53,13 +57,16 @@ public class FieldController {
             @ApiResponse(responseCode = "400", description = "Invalid pagination parameters", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
-    public ResponseEntity<Page<FieldResponseDTO>> getAllFields(
+    public ResponseEntity<PagedModel<FieldResponseDTO>> getAllFields(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size
+            @RequestParam(defaultValue = "20") int size,
+            PagedResourcesAssembler<FieldResponseDTO> pagedAssembler
     ) {
         Pageable pageable = PageRequest.of(page, size);
         Page<FieldResponseDTO> fields = fieldService.getAllFields(pageable);
-        return ResponseEntity.ok(fields);
+
+        PagedModel<FieldResponseDTO> pagedModel = pagedAssembler.toModel(fields, fieldModelAssembler);
+        return ResponseEntity.ok(pagedModel);
     }
 
     @GetMapping("/property/{propertyId}")
@@ -70,14 +77,17 @@ public class FieldController {
             @ApiResponse(responseCode = "404", description = "Property not found", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
-    public ResponseEntity<Page<FieldResponseDTO>> getFieldsByProperty(
+    public ResponseEntity<PagedModel<FieldResponseDTO>> getFieldsByProperty(
             @PathVariable UUID propertyId,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size
+            @RequestParam(defaultValue = "20") int size,
+            PagedResourcesAssembler<FieldResponseDTO> pagedAssembler
     ) {
         Pageable pageable = PageRequest.of(page, size);
         Page<FieldResponseDTO> fields = fieldService.getFieldsByProperty(propertyId, pageable);
-        return ResponseEntity.ok(fields);
+
+        PagedModel<FieldResponseDTO> pagedModel = pagedAssembler.toModel(fields, fieldModelAssembler);
+        return ResponseEntity.ok(pagedModel);
     }
 
     @GetMapping("/{id}")
@@ -90,7 +100,7 @@ public class FieldController {
     })
     public ResponseEntity<FieldResponseDTO> getFieldById(@PathVariable UUID id) {
         FieldResponseDTO field = fieldService.getFieldById(id);
-        return ResponseEntity.ok(field);
+        return ResponseEntity.ok(fieldModelAssembler.toModel(field));
     }
 
     @PutMapping("/{id}")
@@ -109,7 +119,7 @@ public class FieldController {
             FieldUpdateRequestDTO dto
     ) {
         FieldResponseDTO field = fieldService.updateField(id, dto);
-        return ResponseEntity.ok(field);
+        return ResponseEntity.ok(fieldModelAssembler.toModel(field));
     }
 
     @DeleteMapping("/{id}")

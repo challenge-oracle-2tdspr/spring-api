@@ -13,8 +13,28 @@
   ],
   "tags": [
     {
+      "name": "Properties",
+      "description": "Property managing endpoints"
+    },
+    {
+      "name": "Sensor Readings",
+      "description": "Sensor reading managing endpoints"
+    },
+    {
       "name": "Users",
       "description": "User managing endpoints"
+    },
+    {
+      "name": "Harvests",
+      "description": "Harvest managing endpoints"
+    },
+    {
+      "name": "Fields",
+      "description": "Field managing endpoints"
+    },
+    {
+      "name": "Sensors",
+      "description": "Sensor managing endpoints"
     }
   ],
   "paths": {
@@ -129,11 +149,45 @@
         ],
         "responses": {
           "204": {
-            "description": "User deleted",
+            "description": "User deleted"
+          },
+          "400": {
+            "description": "Invalid UUID format"
+          },
+          "404": {
+            "description": "User not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/sensors/{id}": {
+      "get": {
+        "tags": [
+          "Sensors"
+        ],
+        "summary": "Fetch one sensor by its id",
+        "operationId": "getSensorById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sensor fetched",
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/UserResponseDTO"
+                  "$ref": "#/components/schemas/SensorResponseDTO"
                 }
               }
             }
@@ -142,7 +196,585 @@
             "description": "Invalid UUID format"
           },
           "404": {
-            "description": "User not found"
+            "description": "Sensor not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Sensors"
+        ],
+        "summary": "Update sensor",
+        "operationId": "updateSensor",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SensorUpdateRequestDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Sensor updated",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SensorResponseDTO"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input data or validation error"
+          },
+          "404": {
+            "description": "Sensor not found"
+          },
+          "409": {
+            "description": "Sensor code already exists"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Sensors"
+        ],
+        "summary": "Delete sensor",
+        "operationId": "deleteSensor",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Sensor deleted"
+          },
+          "400": {
+            "description": "Invalid UUID format"
+          },
+          "404": {
+            "description": "Sensor not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/sensor-readings/{id}": {
+      "get": {
+        "tags": [
+          "Sensor Readings"
+        ],
+        "summary": "Fetch one sensor reading by its id",
+        "operationId": "getReadingById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sensor reading fetched",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SensorReadingResponseDTO"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid UUID format"
+          },
+          "404": {
+            "description": "Sensor reading not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Sensor Readings"
+        ],
+        "summary": "Update sensor reading",
+        "operationId": "updateReading",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SensorReadingUpdateRequestDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Sensor reading updated",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SensorReadingResponseDTO"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input data or validation error"
+          },
+          "404": {
+            "description": "Sensor reading not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Sensor Readings"
+        ],
+        "summary": "Delete sensor reading",
+        "operationId": "deleteReading",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Sensor reading deleted"
+          },
+          "400": {
+            "description": "Invalid UUID format"
+          },
+          "404": {
+            "description": "Sensor reading not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/properties/{id}": {
+      "get": {
+        "tags": [
+          "Properties"
+        ],
+        "summary": "Fetch one property by its id",
+        "operationId": "getPropertyById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Property fetched",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PropertyResponseDTO"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid UUID format"
+          },
+          "404": {
+            "description": "Property not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Properties"
+        ],
+        "summary": "Update property",
+        "operationId": "updateProperty",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PropertyUpdateRequestDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Property updated",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PropertyResponseDTO"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input data or validation error"
+          },
+          "404": {
+            "description": "Property not found"
+          },
+          "409": {
+            "description": "Property title already exists"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Properties"
+        ],
+        "summary": "Delete property",
+        "operationId": "deleteProperty",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Property deleted"
+          },
+          "400": {
+            "description": "Invalid UUID format"
+          },
+          "404": {
+            "description": "Property not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/harvests/{id}": {
+      "get": {
+        "tags": [
+          "Harvests"
+        ],
+        "summary": "Fetch one harvest by its id",
+        "operationId": "getHarvestById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Harvest fetched",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/HarvestResponseDTO"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid UUID format"
+          },
+          "404": {
+            "description": "Harvest not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Harvests"
+        ],
+        "summary": "Update harvest",
+        "operationId": "updateHarvest",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HarvestUpdateRequestDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Harvest updated",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/HarvestResponseDTO"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input data or validation error"
+          },
+          "404": {
+            "description": "Harvest not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Harvests"
+        ],
+        "summary": "Delete harvest",
+        "operationId": "deleteHarvest",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Harvest deleted"
+          },
+          "400": {
+            "description": "Invalid UUID format"
+          },
+          "404": {
+            "description": "Harvest not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/fields/{id}": {
+      "get": {
+        "tags": [
+          "Fields"
+        ],
+        "summary": "Fetch one field by its id",
+        "operationId": "getFieldById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Field fetched",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/FieldResponseDTO"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid UUID format"
+          },
+          "404": {
+            "description": "Field not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Fields"
+        ],
+        "summary": "Update field",
+        "operationId": "updateField",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FieldUpdateRequestDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Field updated",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/FieldResponseDTO"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input data or validation error"
+          },
+          "404": {
+            "description": "Field not found"
+          },
+          "409": {
+            "description": "Field title already exists for this property"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Fields"
+        ],
+        "summary": "Delete field",
+        "operationId": "deleteField",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Field deleted"
+          },
+          "400": {
+            "description": "Invalid UUID format"
+          },
+          "404": {
+            "description": "Field not found"
           },
           "500": {
             "description": "Internal server error"
@@ -177,6 +809,14 @@
               "format": "int32",
               "default": 20
             }
+          },
+          {
+            "name": "pagedAssembler",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/PagedResourcesAssemblerUserResponseDTO"
+            }
           }
         ],
         "responses": {
@@ -185,7 +825,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/PageUserResponseDTO"
+                  "$ref": "#/components/schemas/PagedModelUserResponseDTO"
                 }
               }
             }
@@ -230,6 +870,1053 @@
           },
           "409": {
             "description": "Email or CPF already exists"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/sensors": {
+      "get": {
+        "tags": [
+          "Sensors"
+        ],
+        "summary": "Fetch all sensors with pagination",
+        "operationId": "getAllSensors",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
+          },
+          {
+            "name": "pagedAssembler",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/PagedResourcesAssemblerSensorResponseDTO"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sensors fetched",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedModelSensorResponseDTO"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid pagination parameters"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Sensors"
+        ],
+        "summary": "Create new sensor",
+        "operationId": "createSensor",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SensorCreateRequestDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Sensor created",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SensorResponseDTO"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input data"
+          },
+          "404": {
+            "description": "Field not found"
+          },
+          "409": {
+            "description": "Sensor code already exists"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/sensor-readings": {
+      "get": {
+        "tags": [
+          "Sensor Readings"
+        ],
+        "summary": "Fetch all sensor readings with pagination",
+        "operationId": "getAllSensorReadings",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
+          },
+          {
+            "name": "pagedAssembler",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/PagedResourcesAssemblerSensorReadingResponseDTO"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sensor readings fetched",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedModelSensorReadingResponseDTO"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid pagination parameters"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Sensor Readings"
+        ],
+        "summary": "Create new sensor reading",
+        "operationId": "createSensorReading",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SensorReadingCreateRequestDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Sensor reading created",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SensorReadingResponseDTO"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input data"
+          },
+          "404": {
+            "description": "Sensor not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/properties": {
+      "get": {
+        "tags": [
+          "Properties"
+        ],
+        "summary": "Fetch all properties with pagination and sorting",
+        "operationId": "getAllProperties",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
+          },
+          {
+            "name": "sortBy",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "createdAt"
+            }
+          },
+          {
+            "name": "sortDirection",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "DESC"
+            }
+          },
+          {
+            "name": "pagedAssembler",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/PagedResourcesAssemblerPropertyResponseDTO"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Properties fetched",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedModelPropertyResponseDTO"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid pagination parameters"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Properties"
+        ],
+        "summary": "Create new property",
+        "operationId": "createProperty",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PropertyCreateRequestDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Property created",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PropertyResponseDTO"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input data"
+          },
+          "404": {
+            "description": "Owner not found"
+          },
+          "409": {
+            "description": "Property title already exists"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/harvests": {
+      "get": {
+        "tags": [
+          "Harvests"
+        ],
+        "summary": "Fetch all harvests with pagination",
+        "operationId": "getAllHarvests",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
+          },
+          {
+            "name": "pagedAssembler",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/PagedResourcesAssemblerHarvestResponseDTO"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Harvests fetched",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedModelHarvestResponseDTO"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid pagination parameters"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Harvests"
+        ],
+        "summary": "Create new harvest",
+        "operationId": "createHarvest",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HarvestCreateRequestDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Harvest created",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/HarvestResponseDTO"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input data"
+          },
+          "404": {
+            "description": "Field not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/fields": {
+      "get": {
+        "tags": [
+          "Fields"
+        ],
+        "summary": "Fetch all fields with pagination",
+        "operationId": "getAllFields",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
+          },
+          {
+            "name": "pagedAssembler",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/PagedResourcesAssemblerFieldResponseDTO"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Fields fetched",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedModelFieldResponseDTO"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid pagination parameters"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Fields"
+        ],
+        "summary": "Create new field",
+        "operationId": "createField",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FieldCreateRequestDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Field created",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/FieldResponseDTO"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input data"
+          },
+          "404": {
+            "description": "Property not found"
+          },
+          "409": {
+            "description": "Field title already exists for this property"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/sensors/status/{status}": {
+      "get": {
+        "tags": [
+          "Sensors"
+        ],
+        "summary": "Fetch sensors by status",
+        "operationId": "getSensorsByStatus",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "ACTIVE",
+                "INACTIVE",
+                "MAINTENANCE",
+                "OFFLINE"
+              ]
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
+          },
+          {
+            "name": "pagedAssembler",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/PagedResourcesAssemblerSensorResponseDTO"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sensors fetched",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedModelSensorResponseDTO"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid status or pagination parameters"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/sensors/field/{fieldId}": {
+      "get": {
+        "tags": [
+          "Sensors"
+        ],
+        "summary": "Fetch all sensors from a field",
+        "operationId": "getSensorsByField",
+        "parameters": [
+          {
+            "name": "fieldId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
+          },
+          {
+            "name": "pagedAssembler",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/PagedResourcesAssemblerSensorResponseDTO"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sensors fetched",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedModelSensorResponseDTO"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid pagination parameters"
+          },
+          "404": {
+            "description": "Field not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/sensors/code/{sensorCode}": {
+      "get": {
+        "tags": [
+          "Sensors"
+        ],
+        "summary": "Fetch sensor by sensor code",
+        "operationId": "getSensorBySensorCode",
+        "parameters": [
+          {
+            "name": "sensorCode",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sensor fetched",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SensorResponseDTO"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Sensor not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/sensor-readings/sensor/{sensorId}": {
+      "get": {
+        "tags": [
+          "Sensor Readings"
+        ],
+        "summary": "Fetch all readings from a sensor",
+        "operationId": "getReadingsBySensor",
+        "parameters": [
+          {
+            "name": "sensorId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
+          },
+          {
+            "name": "pagedAssembler",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/PagedResourcesAssemblerSensorReadingResponseDTO"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sensor readings fetched",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedModelSensorReadingResponseDTO"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid pagination parameters"
+          },
+          "404": {
+            "description": "Sensor not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/sensor-readings/sensor/{sensorId}/range": {
+      "get": {
+        "tags": [
+          "Sensor Readings"
+        ],
+        "summary": "Fetch readings from a sensor within a date range",
+        "operationId": "getReadingsBySensorAndDateRange",
+        "parameters": [
+          {
+            "name": "sensorId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "startTime",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "endTime",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
+          },
+          {
+            "name": "pagedAssembler",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/PagedResourcesAssemblerSensorReadingResponseDTO"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sensor readings fetched",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedModelSensorReadingResponseDTO"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid parameters or date range"
+          },
+          "404": {
+            "description": "Sensor not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/harvests/status/{status}": {
+      "get": {
+        "tags": [
+          "Harvests"
+        ],
+        "summary": "Fetch harvests by status",
+        "operationId": "getHarvestsByStatus",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "PLANNED",
+                "PLANTED",
+                "GROWING",
+                "READY_TO_HARVEST",
+                "HARVESTING",
+                "COMPLETED",
+                "CANCELLED"
+              ]
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
+          },
+          {
+            "name": "pagedAssembler",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/PagedResourcesAssemblerHarvestResponseDTO"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Harvests fetched",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedModelHarvestResponseDTO"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid status or pagination parameters"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/harvests/field/{fieldId}": {
+      "get": {
+        "tags": [
+          "Harvests"
+        ],
+        "summary": "Fetch all harvests from a field",
+        "operationId": "getHarvestsByField",
+        "parameters": [
+          {
+            "name": "fieldId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
+          },
+          {
+            "name": "pagedAssembler",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/PagedResourcesAssemblerHarvestResponseDTO"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Harvests fetched",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedModelHarvestResponseDTO"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid pagination parameters"
+          },
+          "404": {
+            "description": "Field not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/fields/property/{propertyId}": {
+      "get": {
+        "tags": [
+          "Fields"
+        ],
+        "summary": "Fetch all fields from a property",
+        "operationId": "getFieldsByProperty",
+        "parameters": [
+          {
+            "name": "propertyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
+          },
+          {
+            "name": "pagedAssembler",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/PagedResourcesAssemblerFieldResponseDTO"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Fields fetched",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedModelFieldResponseDTO"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid pagination parameters"
+          },
+          "404": {
+            "description": "Property not found"
           },
           "500": {
             "description": "Internal server error"
@@ -313,6 +2000,581 @@
           "updatedAt": {
             "type": "string",
             "format": "date-time"
+          },
+          "_links": {
+            "$ref": "#/components/schemas/Links"
+          }
+        }
+      },
+      "SensorUpdateRequestDTO": {
+        "type": "object",
+        "properties": {
+          "sensorCode": {
+            "type": "string",
+            "maxLength": 50,
+            "minLength": 3
+          },
+          "model": {
+            "type": "string"
+          },
+          "manufacturer": {
+            "type": "string"
+          },
+          "installationDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "batteryLevel": {
+            "type": "integer",
+            "format": "int32",
+            "maximum": 100,
+            "minimum": 0
+          },
+          "lastMaintenance": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ACTIVE",
+              "INACTIVE",
+              "MAINTENANCE",
+              "OFFLINE"
+            ]
+          }
+        }
+      },
+      "SensorResponseDTO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "sensorCode": {
+            "type": "string"
+          },
+          "model": {
+            "type": "string"
+          },
+          "manufacturer": {
+            "type": "string"
+          },
+          "installationDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ACTIVE",
+              "INACTIVE",
+              "MAINTENANCE",
+              "OFFLINE"
+            ]
+          },
+          "batteryLevel": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "lastMaintenance": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "fieldId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "_links": {
+            "$ref": "#/components/schemas/Links"
+          }
+        }
+      },
+      "SensorReadingUpdateRequestDTO": {
+        "type": "object",
+        "properties": {
+          "readingTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "temperature": {
+            "type": "number",
+            "maximum": 70,
+            "minimum": -50
+          },
+          "humidity": {
+            "type": "number",
+            "maximum": 100,
+            "minimum": 0
+          },
+          "soilMoisture": {
+            "type": "number",
+            "maximum": 100,
+            "minimum": 0
+          },
+          "windSpeed": {
+            "type": "number",
+            "minimum": 0
+          },
+          "windDirection": {
+            "type": "string",
+            "maxLength": 10,
+            "minLength": 0
+          },
+          "rainfall": {
+            "type": "number",
+            "minimum": 0
+          },
+          "soilPh": {
+            "type": "number",
+            "maximum": 14,
+            "minimum": 0
+          },
+          "lightIntensity": {
+            "type": "number",
+            "minimum": 0
+          }
+        }
+      },
+      "SensorReadingResponseDTO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "readingTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "temperature": {
+            "type": "number"
+          },
+          "humidity": {
+            "type": "number"
+          },
+          "soilMoisture": {
+            "type": "number"
+          },
+          "windSpeed": {
+            "type": "number"
+          },
+          "windDirection": {
+            "type": "string"
+          },
+          "rainfall": {
+            "type": "number"
+          },
+          "soilPh": {
+            "type": "number"
+          },
+          "lightIntensity": {
+            "type": "number"
+          },
+          "sensorId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "_links": {
+            "$ref": "#/components/schemas/Links"
+          }
+        }
+      },
+      "PropertyUpdateRequestDTO": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "totalArea": {
+            "type": "number"
+          },
+          "areaUnit": {
+            "type": "string",
+            "enum": [
+              "HECTARES",
+              "ACRES",
+              "SQUARE_METER"
+            ]
+          },
+          "address": {
+            "type": "string"
+          },
+          "city": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string"
+          },
+          "country": {
+            "type": "string"
+          },
+          "zipCode": {
+            "type": "string"
+          }
+        }
+      },
+      "PropertyResponseDTO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "totalArea": {
+            "type": "number"
+          },
+          "areaUnit": {
+            "type": "string",
+            "enum": [
+              "HECTARES",
+              "ACRES",
+              "SQUARE_METER"
+            ]
+          },
+          "address": {
+            "type": "string"
+          },
+          "city": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string"
+          },
+          "country": {
+            "type": "string"
+          },
+          "zipCode": {
+            "type": "string"
+          },
+          "ownerId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "_links": {
+            "$ref": "#/components/schemas/Links"
+          }
+        }
+      },
+      "HarvestUpdateRequestDTO": {
+        "type": "object",
+        "properties": {
+          "harverstSeason": {
+            "type": "string"
+          },
+          "crop": {
+            "type": "string"
+          },
+          "expectedHarvestDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "actualStartDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "actualEndDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "harvestedArea": {
+            "type": "number",
+            "minimum": 0
+          },
+          "actualYield": {
+            "type": "number",
+            "minimum": 0
+          },
+          "yieldPerHectare": {
+            "type": "number",
+            "minimum": 0
+          },
+          "qualityGrade": {
+            "type": "string",
+            "enum": [
+              "PREMIUM",
+              "GRADE_A",
+              "GRADE_B",
+              "GRADE_C",
+              "REJECTED"
+            ]
+          },
+          "marketPricePerTon": {
+            "type": "number",
+            "minimum": 0
+          },
+          "totalRevenue": {
+            "type": "number",
+            "minimum": 0
+          },
+          "productionCost": {
+            "type": "number",
+            "minimum": 0
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PLANNED",
+              "PLANTED",
+              "GROWING",
+              "READY_TO_HARVEST",
+              "HARVESTING",
+              "COMPLETED",
+              "CANCELLED"
+            ]
+          },
+          "harvestNotes": {
+            "type": "string"
+          },
+          "weatherConditions": {
+            "type": "string"
+          }
+        }
+      },
+      "HarvestResponseDTO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "harverstSeason": {
+            "type": "string"
+          },
+          "crop": {
+            "type": "string"
+          },
+          "plantingDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "expectedHarvestDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "actualStartDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "actualEndDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "plantedArea": {
+            "type": "number"
+          },
+          "harvestedArea": {
+            "type": "number"
+          },
+          "expectedYield": {
+            "type": "number"
+          },
+          "actualYield": {
+            "type": "number"
+          },
+          "yieldPerHectare": {
+            "type": "number"
+          },
+          "qualityGrade": {
+            "type": "string",
+            "enum": [
+              "PREMIUM",
+              "GRADE_A",
+              "GRADE_B",
+              "GRADE_C",
+              "REJECTED"
+            ]
+          },
+          "marketPricePerTon": {
+            "type": "number"
+          },
+          "totalRevenue": {
+            "type": "number"
+          },
+          "productionCost": {
+            "type": "number"
+          },
+          "profitMargin": {
+            "type": "number"
+          },
+          "harvestNotes": {
+            "type": "string"
+          },
+          "weatherConditions": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PLANNED",
+              "PLANTED",
+              "GROWING",
+              "READY_TO_HARVEST",
+              "HARVESTING",
+              "COMPLETED",
+              "CANCELLED"
+            ]
+          },
+          "fieldId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "_links": {
+            "$ref": "#/components/schemas/Links"
+          }
+        }
+      },
+      "FieldUpdateRequestDTO": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "crop": {
+            "type": "string"
+          },
+          "fieldArea": {
+            "type": "number",
+            "minimum": 0
+          },
+          "areaUnit": {
+            "type": "string",
+            "enum": [
+              "HECTARES",
+              "ACRES",
+              "SQUARE_METER"
+            ]
+          },
+          "soilType": {
+            "type": "string",
+            "enum": [
+              "CLAY",
+              "SAND",
+              "LOAM",
+              "SILT",
+              "PEAT",
+              "CHALK"
+            ]
+          },
+          "irrigationType": {
+            "type": "string",
+            "enum": [
+              "SPRINKLER",
+              "DRIP",
+              "FLOOD",
+              "PIVOT",
+              "NONE"
+            ]
+          }
+        }
+      },
+      "FieldResponseDTO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "crop": {
+            "type": "string"
+          },
+          "fieldArea": {
+            "type": "number"
+          },
+          "areaUnit": {
+            "type": "string",
+            "enum": [
+              "HECTARES",
+              "ACRES",
+              "SQUARE_METER"
+            ]
+          },
+          "soilType": {
+            "type": "string",
+            "enum": [
+              "CLAY",
+              "SAND",
+              "LOAM",
+              "SILT",
+              "PEAT",
+              "CHALK"
+            ]
+          },
+          "irrigationType": {
+            "type": "string",
+            "enum": [
+              "SPRINKLER",
+              "DRIP",
+              "FLOOD",
+              "PIVOT",
+              "NONE"
+            ]
+          },
+          "propertyId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "_links": {
+            "$ref": "#/components/schemas/Links"
           }
         }
       },
@@ -359,90 +2621,503 @@
           "role"
         ]
       },
-      "PageUserResponseDTO": {
+      "SensorCreateRequestDTO": {
         "type": "object",
         "properties": {
-          "totalPages": {
+          "sensorCode": {
+            "type": "string",
+            "maxLength": 50,
+            "minLength": 3
+          },
+          "model": {
+            "type": "string"
+          },
+          "manufacturer": {
+            "type": "string"
+          },
+          "installationDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "batteryLevel": {
             "type": "integer",
-            "format": "int32"
+            "format": "int32",
+            "maximum": 100,
+            "minimum": 0
+          },
+          "fieldId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "fieldId",
+          "sensorCode"
+        ]
+      },
+      "SensorReadingCreateRequestDTO": {
+        "type": "object",
+        "properties": {
+          "readingTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "temperature": {
+            "type": "number",
+            "maximum": 70,
+            "minimum": -50
+          },
+          "humidity": {
+            "type": "number",
+            "maximum": 100,
+            "minimum": 0
+          },
+          "soilMoisture": {
+            "type": "number",
+            "maximum": 100,
+            "minimum": 0
+          },
+          "windSpeed": {
+            "type": "number",
+            "minimum": 0
+          },
+          "windDirection": {
+            "type": "string",
+            "maxLength": 10,
+            "minLength": 0
+          },
+          "rainfall": {
+            "type": "number",
+            "minimum": 0
+          },
+          "soilPh": {
+            "type": "number",
+            "maximum": 14,
+            "minimum": 0
+          },
+          "lightIntensity": {
+            "type": "number",
+            "minimum": 0
+          },
+          "sensorId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "readingTime",
+          "sensorId"
+        ]
+      },
+      "PropertyCreateRequestDTO": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": {
+            "type": "string"
+          },
+          "totalArea": {
+            "type": "number",
+            "minimum": 0
+          },
+          "areaUnit": {
+            "type": "string",
+            "enum": [
+              "HECTARES",
+              "ACRES",
+              "SQUARE_METER"
+            ]
+          },
+          "address": {
+            "type": "string"
+          },
+          "city": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string"
+          },
+          "country": {
+            "type": "string"
+          },
+          "zipCode": {
+            "type": "string"
+          },
+          "ownerId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "areaUnit",
+          "ownerId",
+          "title",
+          "totalArea"
+        ]
+      },
+      "HarvestCreateRequestDTO": {
+        "type": "object",
+        "properties": {
+          "harverstSeason": {
+            "type": "string"
+          },
+          "crop": {
+            "type": "string",
+            "minLength": 1
+          },
+          "plantingDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "expectedHarvestDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "fieldId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "plantedArea": {
+            "type": "number",
+            "minimum": 0
+          },
+          "expectedYield": {
+            "type": "number",
+            "minimum": 0
+          },
+          "qualityGrade": {
+            "type": "string",
+            "enum": [
+              "PREMIUM",
+              "GRADE_A",
+              "GRADE_B",
+              "GRADE_C",
+              "REJECTED"
+            ]
+          },
+          "marketPricePerTon": {
+            "type": "number",
+            "minimum": 0
+          },
+          "productionCost": {
+            "type": "number",
+            "minimum": 0
+          },
+          "harvestNotes": {
+            "type": "string"
+          },
+          "weatherConditions": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "crop",
+          "fieldId",
+          "plantingDate"
+        ]
+      },
+      "FieldCreateRequestDTO": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": {
+            "type": "string"
+          },
+          "crop": {
+            "type": "string",
+            "minLength": 1
+          },
+          "fieldArea": {
+            "type": "number",
+            "minimum": 0
+          },
+          "areaUnit": {
+            "type": "string",
+            "enum": [
+              "HECTARES",
+              "ACRES",
+              "SQUARE_METER"
+            ]
+          },
+          "soilType": {
+            "type": "string",
+            "enum": [
+              "CLAY",
+              "SAND",
+              "LOAM",
+              "SILT",
+              "PEAT",
+              "CHALK"
+            ]
+          },
+          "irrigationType": {
+            "type": "string",
+            "enum": [
+              "SPRINKLER",
+              "DRIP",
+              "FLOOD",
+              "PIVOT",
+              "NONE"
+            ]
+          },
+          "propertyId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "crop",
+          "fieldArea",
+          "propertyId",
+          "title"
+        ]
+      },
+      "PagedResourcesAssemblerUserResponseDTO": {
+        "type": "object",
+        "properties": {
+          "forceFirstAndLastRels": {
+            "type": "boolean",
+            "writeOnly": true
+          }
+        }
+      },
+      "PageMetadata": {
+        "type": "object",
+        "properties": {
+          "size": {
+            "type": "integer",
+            "format": "int64"
           },
           "totalElements": {
             "type": "integer",
             "format": "int64"
           },
-          "size": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "content": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/UserResponseDTO"
-            }
-          },
-          "number": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "sort": {
-            "$ref": "#/components/schemas/SortObject"
-          },
-          "first": {
-            "type": "boolean"
-          },
-          "last": {
-            "type": "boolean"
-          },
-          "numberOfElements": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "pageable": {
-            "$ref": "#/components/schemas/PageableObject"
-          },
-          "empty": {
-            "type": "boolean"
-          }
-        }
-      },
-      "PageableObject": {
-        "type": "object",
-        "properties": {
-          "offset": {
+          "totalPages": {
             "type": "integer",
             "format": "int64"
           },
-          "sort": {
-            "$ref": "#/components/schemas/SortObject"
-          },
-          "unpaged": {
-            "type": "boolean"
-          },
-          "paged": {
-            "type": "boolean"
-          },
-          "pageNumber": {
+          "number": {
             "type": "integer",
-            "format": "int32"
-          },
-          "pageSize": {
-            "type": "integer",
-            "format": "int32"
+            "format": "int64"
           }
         }
       },
-      "SortObject": {
+      "PagedModelUserResponseDTO": {
         "type": "object",
         "properties": {
-          "empty": {
-            "type": "boolean"
+          "_embedded": {
+            "type": "object",
+            "properties": {
+              "userResponseDTOList": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/UserResponseDTO"
+                }
+              }
+            }
           },
-          "unsorted": {
-            "type": "boolean"
+          "_links": {
+            "$ref": "#/components/schemas/Links"
           },
-          "sorted": {
+          "page": {
+            "$ref": "#/components/schemas/PageMetadata"
+          }
+        }
+      },
+      "PagedResourcesAssemblerSensorResponseDTO": {
+        "type": "object",
+        "properties": {
+          "forceFirstAndLastRels": {
+            "type": "boolean",
+            "writeOnly": true
+          }
+        }
+      },
+      "PagedModelSensorResponseDTO": {
+        "type": "object",
+        "properties": {
+          "_embedded": {
+            "type": "object",
+            "properties": {
+              "sensorResponseDTOList": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/SensorResponseDTO"
+                }
+              }
+            }
+          },
+          "_links": {
+            "$ref": "#/components/schemas/Links"
+          },
+          "page": {
+            "$ref": "#/components/schemas/PageMetadata"
+          }
+        }
+      },
+      "PagedResourcesAssemblerSensorReadingResponseDTO": {
+        "type": "object",
+        "properties": {
+          "forceFirstAndLastRels": {
+            "type": "boolean",
+            "writeOnly": true
+          }
+        }
+      },
+      "PagedModelSensorReadingResponseDTO": {
+        "type": "object",
+        "properties": {
+          "_embedded": {
+            "type": "object",
+            "properties": {
+              "sensorReadingResponseDTOList": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/SensorReadingResponseDTO"
+                }
+              }
+            }
+          },
+          "_links": {
+            "$ref": "#/components/schemas/Links"
+          },
+          "page": {
+            "$ref": "#/components/schemas/PageMetadata"
+          }
+        }
+      },
+      "PagedResourcesAssemblerPropertyResponseDTO": {
+        "type": "object",
+        "properties": {
+          "forceFirstAndLastRels": {
+            "type": "boolean",
+            "writeOnly": true
+          }
+        }
+      },
+      "PagedModelPropertyResponseDTO": {
+        "type": "object",
+        "properties": {
+          "_embedded": {
+            "type": "object",
+            "properties": {
+              "propertyResponseDTOList": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/PropertyResponseDTO"
+                }
+              }
+            }
+          },
+          "_links": {
+            "$ref": "#/components/schemas/Links"
+          },
+          "page": {
+            "$ref": "#/components/schemas/PageMetadata"
+          }
+        }
+      },
+      "PagedResourcesAssemblerHarvestResponseDTO": {
+        "type": "object",
+        "properties": {
+          "forceFirstAndLastRels": {
+            "type": "boolean",
+            "writeOnly": true
+          }
+        }
+      },
+      "PagedModelHarvestResponseDTO": {
+        "type": "object",
+        "properties": {
+          "_embedded": {
+            "type": "object",
+            "properties": {
+              "harvestResponseDTOList": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/HarvestResponseDTO"
+                }
+              }
+            }
+          },
+          "_links": {
+            "$ref": "#/components/schemas/Links"
+          },
+          "page": {
+            "$ref": "#/components/schemas/PageMetadata"
+          }
+        }
+      },
+      "PagedResourcesAssemblerFieldResponseDTO": {
+        "type": "object",
+        "properties": {
+          "forceFirstAndLastRels": {
+            "type": "boolean",
+            "writeOnly": true
+          }
+        }
+      },
+      "PagedModelFieldResponseDTO": {
+        "type": "object",
+        "properties": {
+          "_embedded": {
+            "type": "object",
+            "properties": {
+              "fieldResponseDTOList": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/FieldResponseDTO"
+                }
+              }
+            }
+          },
+          "_links": {
+            "$ref": "#/components/schemas/Links"
+          },
+          "page": {
+            "$ref": "#/components/schemas/PageMetadata"
+          }
+        }
+      },
+      "Link": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "hreflang": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "deprecation": {
+            "type": "string"
+          },
+          "profile": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "templated": {
             "type": "boolean"
           }
+        }
+      },
+      "Links": {
+        "type": "object",
+        "additionalProperties": {
+          "$ref": "#/components/schemas/Link"
         }
       }
     }
