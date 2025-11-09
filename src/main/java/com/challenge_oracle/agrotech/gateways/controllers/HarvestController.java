@@ -1,5 +1,6 @@
 package com.challenge_oracle.agrotech.gateways.controllers;
 
+import com.challenge_oracle.agrotech.assemblers.HarvestModelAssembler;
 import com.challenge_oracle.agrotech.enums.HarvestStatus;
 import com.challenge_oracle.agrotech.gateways.requests.HarvestCreateRequestDTO;
 import com.challenge_oracle.agrotech.gateways.requests.HarvestUpdateRequestDTO;
@@ -15,6 +16,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -28,6 +31,7 @@ import java.util.UUID;
 public class HarvestController {
 
     private final HarvestService harvestService;
+    private final HarvestModelAssembler harvestModelAssembler;
 
     @PostMapping
     @Operation(summary = "Create new harvest")
@@ -43,7 +47,7 @@ public class HarvestController {
             HarvestCreateRequestDTO dto
     ) {
         HarvestResponseDTO harvest = harvestService.createHarvest(dto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(harvest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(harvestModelAssembler.toModel(harvest));
     }
 
     @GetMapping
@@ -53,13 +57,16 @@ public class HarvestController {
             @ApiResponse(responseCode = "400", description = "Invalid pagination parameters", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
-    public ResponseEntity<Page<HarvestResponseDTO>> getAllHarvests(
+    public ResponseEntity<PagedModel<HarvestResponseDTO>> getAllHarvests(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size
+            @RequestParam(defaultValue = "20") int size,
+            PagedResourcesAssembler<HarvestResponseDTO> pagedAssembler
     ) {
         Pageable pageable = PageRequest.of(page, size);
         Page<HarvestResponseDTO> harvests = harvestService.getAllHarvests(pageable);
-        return ResponseEntity.ok(harvests);
+
+        PagedModel<HarvestResponseDTO> pagedModel = pagedAssembler.toModel(harvests, harvestModelAssembler);
+        return ResponseEntity.ok(pagedModel);
     }
 
     @GetMapping("/field/{fieldId}")
@@ -70,14 +77,17 @@ public class HarvestController {
             @ApiResponse(responseCode = "404", description = "Field not found", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
-    public ResponseEntity<Page<HarvestResponseDTO>> getHarvestsByField(
+    public ResponseEntity<PagedModel<HarvestResponseDTO>> getHarvestsByField(
             @PathVariable UUID fieldId,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size
+            @RequestParam(defaultValue = "20") int size,
+            PagedResourcesAssembler<HarvestResponseDTO> pagedAssembler
     ) {
         Pageable pageable = PageRequest.of(page, size);
         Page<HarvestResponseDTO> harvests = harvestService.getHarvestsByField(fieldId, pageable);
-        return ResponseEntity.ok(harvests);
+
+        PagedModel<HarvestResponseDTO> pagedModel = pagedAssembler.toModel(harvests, harvestModelAssembler);
+        return ResponseEntity.ok(pagedModel);
     }
 
     @GetMapping("/status/{status}")
@@ -87,14 +97,17 @@ public class HarvestController {
             @ApiResponse(responseCode = "400", description = "Invalid status or pagination parameters", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
-    public ResponseEntity<Page<HarvestResponseDTO>> getHarvestsByStatus(
+    public ResponseEntity<PagedModel<HarvestResponseDTO>> getHarvestsByStatus(
             @PathVariable HarvestStatus status,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size
+            @RequestParam(defaultValue = "20") int size,
+            PagedResourcesAssembler<HarvestResponseDTO> pagedAssembler
     ) {
         Pageable pageable = PageRequest.of(page, size);
         Page<HarvestResponseDTO> harvests = harvestService.getHarvestsByStatus(status, pageable);
-        return ResponseEntity.ok(harvests);
+
+        PagedModel<HarvestResponseDTO> pagedModel = pagedAssembler.toModel(harvests, harvestModelAssembler);
+        return ResponseEntity.ok(pagedModel);
     }
 
     @GetMapping("/{id}")
@@ -107,7 +120,7 @@ public class HarvestController {
     })
     public ResponseEntity<HarvestResponseDTO> getHarvestById(@PathVariable UUID id) {
         HarvestResponseDTO harvest = harvestService.getHarvestById(id);
-        return ResponseEntity.ok(harvest);
+        return ResponseEntity.ok(harvestModelAssembler.toModel(harvest));
     }
 
     @PutMapping("/{id}")
@@ -125,7 +138,7 @@ public class HarvestController {
             HarvestUpdateRequestDTO dto
     ) {
         HarvestResponseDTO harvest = harvestService.updateHarvest(id, dto);
-        return ResponseEntity.ok(harvest);
+        return ResponseEntity.ok(harvestModelAssembler.toModel(harvest));
     }
 
     @DeleteMapping("/{id}")

@@ -1,5 +1,6 @@
 package com.challenge_oracle.agrotech.gateways.controllers;
 
+import com.challenge_oracle.agrotech.assemblers.UserModelAssembler;
 import com.challenge_oracle.agrotech.gateways.requests.UserCreateRequestDTO;
 import com.challenge_oracle.agrotech.gateways.requests.UserUpdateRequestDTO;
 import com.challenge_oracle.agrotech.gateways.responses.UserResponseDTO;
@@ -14,6 +15,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,6 +30,7 @@ import java.util.UUID;
 public class UserController {
 
     private final UserService userService;
+    private final UserModelAssembler userModelAssembler;
 
     @PostMapping
     @Operation(summary = "Create new user")
@@ -42,7 +46,7 @@ public class UserController {
             UserCreateRequestDTO dto
     ) {
         UserResponseDTO user = userService.createUser(dto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(user);
+        return ResponseEntity.status(HttpStatus.CREATED).body(userModelAssembler.toModel(user));
     }
 
     @GetMapping
@@ -52,13 +56,16 @@ public class UserController {
             @ApiResponse(responseCode = "400", description = "Invalid pagination parameters", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
-    public ResponseEntity<Page<UserResponseDTO>> getAllUsers(
+    public ResponseEntity<PagedModel<UserResponseDTO>> getAllUsers(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size
+            @RequestParam(defaultValue = "20") int size,
+            PagedResourcesAssembler<UserResponseDTO> pagedAssembler
     ) {
         Pageable pageable = PageRequest.of(page, size);
         Page<UserResponseDTO> users = userService.getAllUsers(pageable);
-        return ResponseEntity.ok(users);
+
+        PagedModel<UserResponseDTO> pagedModel = pagedAssembler.toModel(users, userModelAssembler);
+        return ResponseEntity.ok(pagedModel);
     }
 
     @GetMapping("/{id}")
@@ -71,7 +78,7 @@ public class UserController {
     })
     public ResponseEntity<UserResponseDTO> getUserById(@PathVariable UUID id) {
         UserResponseDTO user = userService.getUserById(id);
-        return ResponseEntity.ok(user);
+        return ResponseEntity.ok(userModelAssembler.toModel(user));
     }
 
     @PutMapping("/{id}")
@@ -82,13 +89,13 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "User not found", content = @Content),
             @ApiResponse(responseCode = "409", description = "Email or CPF already exists", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
-})
+    })
     public ResponseEntity<UserResponseDTO> updateUser(
             @PathVariable UUID id,
             @RequestBody UserUpdateRequestDTO dto
     ) {
         UserResponseDTO user = userService.updateUser(id, dto);
-        return ResponseEntity.ok(user);
+        return ResponseEntity.ok(userModelAssembler.toModel(user));
     }
 
     @DeleteMapping("/{id}")
@@ -99,7 +106,7 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "User not found", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
-    public ResponseEntity<UserResponseDTO> deleteUser(@PathVariable UUID id) {
+    public ResponseEntity<Void> deleteUser(@PathVariable UUID id) {
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
     }
