@@ -298,3 +298,113 @@ O acesso é publico para facilitar visualização.
 ## Vídeo de apresentação
 
 https://www.youtube.com/watch?v=TwlQuYMBLX0
+
+## Guia para deploy em cloud
+
+Guia simplificado para deploy em provedores cloud usando Docker.
+
+### Pré-requisitos
+
+- VM Linux Ubuntu 22.04/24.04
+- Acesso SSH configurado
+- IP público
+- Mínimo: 1 vCPU + 1 GB RAM
+
+### Passo 1: Preparar VM
+
+#### Conectar via SSH
+```bash
+ssh seu-usuario@ip-publico-vm
+```
+
+#### Atualizar sistema e instalar ferramentas
+```bash
+sudo apt update && sudo apt upgrade -y
+
+sudo apt install -y wget curl git
+```
+
+### Passo 2: instalar Docker
+```bash
+sudo apt install -y apt-transport-https ca-certificates curl software-properties-common
+
+sudo install -m 0755 -d /etc/apt/keyrings
+sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+sudo chmod a+r /etc/apt/keyrings/docker.asc
+
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+  $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+```
+### Passo 3: configurar seu provedor
+No console do seu provedor cloud, libere a porta 8080 para acesso TCP no seu Security Group ou Firewall
+
+### Passo 4: deploy da aplicação
+Clone o repositório
+```bash
+git clone https://github.com/challenge-oracle-2tdspr/spring-api.git
+
+cd spring-api
+```
+
+Crie seu arquivo .env
+```bash
+nano .env
+```
+
+Configure as variaveis com suas credenciais
+
+Dê permissão para o Maven
+```bash
+chmod +x mvnw
+```
+
+Faça o build com o Docker Compose
+```bash
+docker compose -f docker-compose.prod.yml up -d --build
+```
+
+Se necessário, acompanhe os logs dos containers
+```bash
+docker compose -f docker-compose.prod.yml logs -f
+```
+
+### Passo 5: verificar
+Verifique o status dos containers
+```bash
+docker compose -f docker-compose.prod.yml ps
+```
+
+Teste localmente
+```bash
+curl http://localhost:8080/actuator/health
+```
+
+Teste externamente
+```bash
+curl http://<ip-publico-vm>:8080/actuator/health
+```
+
+### Troubleshooting
+**Container não sobe:**
+```bash
+docker compose -f docker-compose.prod.yml logs agrotech-api --tail=100
+```
+
+**API não acessível:**
+- Verifique firewall do provedor cloud
+- Verifique: `sudo iptables -L -n | grep 8080`
+- Verifique: `docker compose -f docker-compose.prod.yml ps`
+
+### Conectar ao Banco (DBeaver/DataGrip)
+
+**Via SSH Tunnel:**
+- Database Host: `localhost`
+- Database Port: `5432`
+- SSH Host: `<ip-publico-vm>`
+- SSH Port: `22`
+- SSH User: `ubuntu`
+- SSH Key: <sua-chave-privada>
