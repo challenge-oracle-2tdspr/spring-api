@@ -5,7 +5,7 @@ CREATE TABLE sensor_readings (
     humidity NUMERIC(5, 2),
     soil_moisture NUMERIC(5, 2),
     wind_speed NUMERIC(5, 2),
-    wind_direction VARCHAR(255),
+    wind_direction NUMERIC(5, 2),
     rainfall NUMERIC(6, 2),
     soil_ph NUMERIC(4, 2),
     light_intensity NUMERIC(8, 2),

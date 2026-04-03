@@ -42,7 +42,7 @@ public class SensorReading {
     private BigDecimal windSpeed;
 
     @Column(name = "wind_direction", precision = 5, scale = 2)
-    private String windDirection;
+    private BigDecimal windDirection;
 
     @Column(name = "rainfall", precision = 6, scale = 2)
     private BigDecimal rainfall;
