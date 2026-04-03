@@ -49,6 +49,9 @@ public class Property {
 
     private String zipCode;
 
+    @OneToMany(mappedBy = "property", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<PropertyMember> members;
+
     @CreationTimestamp
     @Column(name = "created_at")
     private LocalDateTime createdAt;

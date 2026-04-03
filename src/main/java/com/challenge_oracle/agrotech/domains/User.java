@@ -64,4 +64,7 @@ public class User {
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Property> properties;
 
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    private List<PropertyMember> propertyMemberships;
+
 }
