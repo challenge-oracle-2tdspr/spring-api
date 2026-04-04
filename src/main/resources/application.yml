@@ -47,6 +47,9 @@ spring:
         circuitbreaker:
           enabled: true
 
+  jwt:
+    expiration: 86400000
+
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
@@ -75,3 +78,9 @@ logging:
   level:
     org.hibernate.SQL: ${LOG_SQL:DEBUG}
     com.challengeoracle.agrotech: DEBUG
+
+services:
+  apex:
+    field: www.teste.com
+    sensor: www.teste.com
+    sensor-reading: www.teste.com

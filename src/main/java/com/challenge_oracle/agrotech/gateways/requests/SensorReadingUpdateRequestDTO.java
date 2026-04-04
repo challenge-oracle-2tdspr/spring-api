@@ -30,8 +30,9 @@ public class SensorReadingUpdateRequestDTO {
     @Digits(integer = 3, fraction = 2, message = "windSpeed must have at most 3 integer digits and 2 decimal places")
     private BigDecimal windSpeed;
 
-    @Size(max = 10, message = "windDirection must have at most 10 characters")
-    private String windDirection;
+    @DecimalMin(value = "0", message = "windDirection must be greater than or equal to 0")
+    @Digits(integer = 3, fraction = 2, message = "windDirection must have at most 3 integer digits and 2 decimal places")
+    private BigDecimal windDirection;
 
     @DecimalMin(value = "0", message = "rainfall must be greater than or equal to 0")
     @Digits(integer = 4, fraction = 2, message = "rainfall must have at most 4 integer digits and 2 decimal places")

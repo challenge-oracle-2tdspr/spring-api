@@ -20,6 +20,7 @@ import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -34,10 +35,12 @@ public class PropertyController {
     private final PropertyModelAssembler propertyModelAssembler;
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
     @Operation(summary = "Create new property")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "Property created"),
             @ApiResponse(responseCode = "400", description = "Invalid input data", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Access denied", content = @Content),
             @ApiResponse(responseCode = "404", description = "Owner not found", content = @Content),
             @ApiResponse(responseCode = "409", description = "Property title already exists", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
@@ -52,10 +55,12 @@ public class PropertyController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'USER')")
     @Operation(summary = "Fetch all properties with pagination and sorting")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Properties fetched"),
             @ApiResponse(responseCode = "400", description = "Invalid pagination parameters", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Access denied", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
     public ResponseEntity<PagedModel<PropertyResponseDTO>> getAllProperties(
@@ -76,10 +81,12 @@ public class PropertyController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'USER')")
     @Operation(summary = "Fetch one property by its id")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Property fetched"),
             @ApiResponse(responseCode = "400", description = "Invalid UUID format", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Access denied", content = @Content),
             @ApiResponse(responseCode = "404", description = "Property not found", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
@@ -89,10 +96,12 @@ public class PropertyController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
     @Operation(summary = "Update property")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Property updated"),
             @ApiResponse(responseCode = "400", description = "Invalid input data or validation error", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Access denied", content = @Content),
             @ApiResponse(responseCode = "404", description = "Property not found", content = @Content),
             @ApiResponse(responseCode = "409", description = "Property title already exists", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
@@ -108,10 +117,12 @@ public class PropertyController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Delete property")
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "Property deleted"),
             @ApiResponse(responseCode = "400", description = "Invalid UUID format", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Access denied", content = @Content),
             @ApiResponse(responseCode = "404", description = "Property not found", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })

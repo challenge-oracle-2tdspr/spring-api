@@ -24,7 +24,7 @@ public class SensorReadingResponseDTO extends RepresentationModel<SensorReadingR
     private BigDecimal humidity;
     private BigDecimal soilMoisture;
     private BigDecimal windSpeed;
-    private String windDirection;
+    private BigDecimal windDirection;
     private BigDecimal rainfall;
     private BigDecimal soilPh;
     private BigDecimal lightIntensity;
