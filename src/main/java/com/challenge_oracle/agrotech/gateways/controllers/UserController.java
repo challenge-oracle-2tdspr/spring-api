@@ -19,6 +19,7 @@ import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -33,27 +34,29 @@ public class UserController {
     private final UserModelAssembler userModelAssembler;
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
     @Operation(summary = "Create new user")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "User created"),
-            @ApiResponse(responseCode = "400", description = "Invalid input date", content = @Content),
+            @ApiResponse(responseCode = "400", description = "Invalid input data", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Access denied", content = @Content),
             @ApiResponse(responseCode = "409", description = "Email or CPF already exists", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
-    public ResponseEntity<UserResponseDTO> createUser (
-            @Valid
-            @RequestBody
-            UserCreateRequestDTO dto
+    public ResponseEntity<UserResponseDTO> createUser(
+            @Valid @RequestBody UserCreateRequestDTO dto
     ) {
         UserResponseDTO user = userService.createUser(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(userModelAssembler.toModel(user));
     }
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
     @Operation(summary = "Fetch all users with pagination")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Users fetched"),
             @ApiResponse(responseCode = "400", description = "Invalid pagination parameters", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Access denied", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
     public ResponseEntity<PagedModel<UserResponseDTO>> getAllUsers(
@@ -63,18 +66,19 @@ public class UserController {
     ) {
         Pageable pageable = PageRequest.of(page, size);
         Page<UserResponseDTO> users = userService.getAllUsers(pageable);
-
         PagedModel<UserResponseDTO> pagedModel = pagedAssembler.toModel(users, userModelAssembler);
         return ResponseEntity.ok(pagedModel);
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'USER')")
     @Operation(summary = "Fetch one user by its id")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "User fetched"),
             @ApiResponse(responseCode = "400", description = "Invalid UUID format", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Access denied", content = @Content),
             @ApiResponse(responseCode = "404", description = "User not found", content = @Content),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content)
+            @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
     public ResponseEntity<UserResponseDTO> getUserById(@PathVariable UUID id) {
         UserResponseDTO user = userService.getUserById(id);
@@ -82,27 +86,31 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
     @Operation(summary = "Update user")
     @ApiResponses({
-            @ApiResponse(responseCode ="200",description = "User updated"),
+            @ApiResponse(responseCode = "200", description = "User updated"),
             @ApiResponse(responseCode = "400", description = "Invalid input data or validation error", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Access denied", content = @Content),
             @ApiResponse(responseCode = "404", description = "User not found", content = @Content),
             @ApiResponse(responseCode = "409", description = "Email or CPF already exists", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
     public ResponseEntity<UserResponseDTO> updateUser(
             @PathVariable UUID id,
-            @RequestBody UserUpdateRequestDTO dto
+            @Valid @RequestBody UserUpdateRequestDTO dto
     ) {
         UserResponseDTO user = userService.updateUser(id, dto);
         return ResponseEntity.ok(userModelAssembler.toModel(user));
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Delete user")
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "User deleted"),
             @ApiResponse(responseCode = "400", description = "Invalid UUID format", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Access denied", content = @Content),
             @ApiResponse(responseCode = "404", description = "User not found", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
