@@ -84,3 +84,6 @@ services:
     field: www.teste.com
     sensor: www.teste.com
     sensor-reading: www.teste.com
+
+webhook:
+  api-key: ${SENSOR_WEBHOOK_API_KEY:chave-local}

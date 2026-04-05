@@ -2,7 +2,6 @@ package com.challenge_oracle.agrotech.gateways.controllers;
 
 import com.challenge_oracle.agrotech.assemblers.SensorReadingModelAssembler;
 import com.challenge_oracle.agrotech.gateways.requests.SensorReadingCreateRequestDTO;
-import com.challenge_oracle.agrotech.gateways.requests.SensorReadingUpdateRequestDTO;
 import com.challenge_oracle.agrotech.gateways.responses.SensorReadingResponseDTO;
 import com.challenge_oracle.agrotech.services.SensorReadingService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -20,6 +19,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -35,27 +35,28 @@ public class SensorReadingController {
     private final SensorReadingModelAssembler sensorReadingModelAssembler;
 
     @PostMapping
-    @Operation(summary = "Create new sensor reading")
+    @PreAuthorize("hasRole('WEBHOOK')")
+    @Operation(summary = "Create new sensor reading (webhook only)")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "Sensor reading created"),
             @ApiResponse(responseCode = "400", description = "Invalid input data", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Missing or invalid API Key", content = @Content),
             @ApiResponse(responseCode = "404", description = "Sensor not found", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
     public ResponseEntity<SensorReadingResponseDTO> createSensorReading(
-            @Valid
-            @RequestBody
-            SensorReadingCreateRequestDTO dto
+            @Valid @RequestBody SensorReadingCreateRequestDTO dto
     ) {
         SensorReadingResponseDTO reading = sensorReadingService.createSensorReading(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(sensorReadingModelAssembler.toModel(reading));
     }
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'USER')")
     @Operation(summary = "Fetch all sensor readings with pagination")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Sensor readings fetched"),
-            @ApiResponse(responseCode = "400", description = "Invalid pagination parameters", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Access denied", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
     public ResponseEntity<PagedModel<SensorReadingResponseDTO>> getAllSensorReadings(
@@ -65,42 +66,43 @@ public class SensorReadingController {
     ) {
         Pageable pageable = PageRequest.of(page, size);
         Page<SensorReadingResponseDTO> readings = sensorReadingService.getAllSensorReadings(pageable);
-
         PagedModel<SensorReadingResponseDTO> pagedModel = pagedAssembler.toModel(readings, sensorReadingModelAssembler);
         return ResponseEntity.ok(pagedModel);
     }
 
-    @GetMapping("/sensor/{sensorId}")
-    @Operation(summary = "Fetch all readings from a sensor")
+    @GetMapping("/field/{fieldId}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'USER')")
+    @Operation(summary = "Fetch all readings from a field")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Sensor readings fetched"),
-            @ApiResponse(responseCode = "400", description = "Invalid pagination parameters", content = @Content),
-            @ApiResponse(responseCode = "404", description = "Sensor not found", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Access denied", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Field not found", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
-    public ResponseEntity<PagedModel<SensorReadingResponseDTO>> getReadingsBySensor(
-            @PathVariable UUID sensorId,
+    public ResponseEntity<PagedModel<SensorReadingResponseDTO>> getReadingsByField(
+            @PathVariable UUID fieldId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             PagedResourcesAssembler<SensorReadingResponseDTO> pagedAssembler
     ) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<SensorReadingResponseDTO> readings = sensorReadingService.getReadingsBySensor(sensorId, pageable);
-
+        Page<SensorReadingResponseDTO> readings = sensorReadingService.getReadingsByField(fieldId, pageable);
         PagedModel<SensorReadingResponseDTO> pagedModel = pagedAssembler.toModel(readings, sensorReadingModelAssembler);
         return ResponseEntity.ok(pagedModel);
     }
 
-    @GetMapping("/sensor/{sensorId}/range")
-    @Operation(summary = "Fetch readings from a sensor within a date range")
+    @GetMapping("/field/{fieldId}/range")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'USER')")
+    @Operation(summary = "Fetch readings from a field within a date range")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Sensor readings fetched"),
-            @ApiResponse(responseCode = "400", description = "Invalid parameters or date range", content = @Content),
-            @ApiResponse(responseCode = "404", description = "Sensor not found", content = @Content),
+            @ApiResponse(responseCode = "400", description = "Invalid date range", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Access denied", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Field not found", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
-    public ResponseEntity<PagedModel<SensorReadingResponseDTO>> getReadingsBySensorAndDateRange(
-            @PathVariable UUID sensorId,
+    public ResponseEntity<PagedModel<SensorReadingResponseDTO>> getReadingsByFieldAndDateRange(
+            @PathVariable UUID fieldId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startTime,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endTime,
             @RequestParam(defaultValue = "0") int page,
@@ -108,58 +110,23 @@ public class SensorReadingController {
             PagedResourcesAssembler<SensorReadingResponseDTO> pagedAssembler
     ) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<SensorReadingResponseDTO> readings = sensorReadingService.getReadingsBySensorAndDateRange(
-                sensorId,
-                startTime,
-                endTime,
-                pageable
-        );
-
+        Page<SensorReadingResponseDTO> readings = sensorReadingService
+                .getReadingsByFieldAndDateRange(fieldId, startTime, endTime, pageable);
         PagedModel<SensorReadingResponseDTO> pagedModel = pagedAssembler.toModel(readings, sensorReadingModelAssembler);
         return ResponseEntity.ok(pagedModel);
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'USER')")
     @Operation(summary = "Fetch one sensor reading by its id")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Sensor reading fetched"),
-            @ApiResponse(responseCode = "400", description = "Invalid UUID format", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Access denied", content = @Content),
             @ApiResponse(responseCode = "404", description = "Sensor reading not found", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
     public ResponseEntity<SensorReadingResponseDTO> getReadingById(@PathVariable UUID id) {
         SensorReadingResponseDTO reading = sensorReadingService.getReadingById(id);
         return ResponseEntity.ok(sensorReadingModelAssembler.toModel(reading));
-    }
-
-    @PutMapping("/{id}")
-    @Operation(summary = "Update sensor reading")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Sensor reading updated"),
-            @ApiResponse(responseCode = "400", description = "Invalid input data or validation error", content = @Content),
-            @ApiResponse(responseCode = "404", description = "Sensor reading not found", content = @Content),
-            @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
-    })
-    public ResponseEntity<SensorReadingResponseDTO> updateReading(
-            @PathVariable UUID id,
-            @Valid
-            @RequestBody
-            SensorReadingUpdateRequestDTO dto
-    ) {
-        SensorReadingResponseDTO reading = sensorReadingService.updateReading(id, dto);
-        return ResponseEntity.ok(sensorReadingModelAssembler.toModel(reading));
-    }
-
-    @DeleteMapping("/{id}")
-    @Operation(summary = "Delete sensor reading")
-    @ApiResponses({
-            @ApiResponse(responseCode = "204", description = "Sensor reading deleted"),
-            @ApiResponse(responseCode = "400", description = "Invalid UUID format", content = @Content),
-            @ApiResponse(responseCode = "404", description = "Sensor reading not found", content = @Content),
-            @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
-    })
-    public ResponseEntity<Void> deleteReading(@PathVariable UUID id) {
-        sensorReadingService.deleteReading(id);
-        return ResponseEntity.noContent().build();
     }
 }
