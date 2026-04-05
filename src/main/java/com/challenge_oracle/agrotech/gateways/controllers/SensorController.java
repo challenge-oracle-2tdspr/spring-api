@@ -20,6 +20,7 @@ import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -27,6 +28,7 @@ import java.util.UUID;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/sensors")
+@PreAuthorize("hasRole('ADMIN')")
 @Tag(name = "Sensors", description = "Sensor managing endpoints")
 public class SensorController {
 
@@ -38,14 +40,13 @@ public class SensorController {
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "Sensor created"),
             @ApiResponse(responseCode = "400", description = "Invalid input data", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Access denied", content = @Content),
             @ApiResponse(responseCode = "404", description = "Field not found", content = @Content),
             @ApiResponse(responseCode = "409", description = "Sensor code already exists", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
     public ResponseEntity<SensorResponseDTO> createSensor(
-            @Valid
-            @RequestBody
-            SensorCreateRequestDTO dto
+            @Valid @RequestBody SensorCreateRequestDTO dto
     ) {
         SensorResponseDTO sensor = sensorService.createSensor(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(sensorModelAssembler.toModel(sensor));
@@ -56,6 +57,7 @@ public class SensorController {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Sensors fetched"),
             @ApiResponse(responseCode = "400", description = "Invalid pagination parameters", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Access denied", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
     public ResponseEntity<PagedModel<SensorResponseDTO>> getAllSensors(
@@ -65,7 +67,6 @@ public class SensorController {
     ) {
         Pageable pageable = PageRequest.of(page, size);
         Page<SensorResponseDTO> sensors = sensorService.getAllSensors(pageable);
-
         PagedModel<SensorResponseDTO> pagedModel = pagedAssembler.toModel(sensors, sensorModelAssembler);
         return ResponseEntity.ok(pagedModel);
     }
@@ -75,6 +76,7 @@ public class SensorController {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Sensors fetched"),
             @ApiResponse(responseCode = "400", description = "Invalid pagination parameters", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Access denied", content = @Content),
             @ApiResponse(responseCode = "404", description = "Field not found", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
@@ -86,7 +88,6 @@ public class SensorController {
     ) {
         Pageable pageable = PageRequest.of(page, size);
         Page<SensorResponseDTO> sensors = sensorService.getSensorsByField(fieldId, pageable);
-
         PagedModel<SensorResponseDTO> pagedModel = pagedAssembler.toModel(sensors, sensorModelAssembler);
         return ResponseEntity.ok(pagedModel);
     }
@@ -96,6 +97,7 @@ public class SensorController {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Sensors fetched"),
             @ApiResponse(responseCode = "400", description = "Invalid status or pagination parameters", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Access denied", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
     public ResponseEntity<PagedModel<SensorResponseDTO>> getSensorsByStatus(
@@ -106,7 +108,6 @@ public class SensorController {
     ) {
         Pageable pageable = PageRequest.of(page, size);
         Page<SensorResponseDTO> sensors = sensorService.getSensorsByStatus(status, pageable);
-
         PagedModel<SensorResponseDTO> pagedModel = pagedAssembler.toModel(sensors, sensorModelAssembler);
         return ResponseEntity.ok(pagedModel);
     }
@@ -116,6 +117,7 @@ public class SensorController {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Sensor fetched"),
             @ApiResponse(responseCode = "400", description = "Invalid UUID format", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Access denied", content = @Content),
             @ApiResponse(responseCode = "404", description = "Sensor not found", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
@@ -128,6 +130,7 @@ public class SensorController {
     @Operation(summary = "Fetch sensor by sensor code")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Sensor fetched"),
+            @ApiResponse(responseCode = "403", description = "Access denied", content = @Content),
             @ApiResponse(responseCode = "404", description = "Sensor not found", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
@@ -141,15 +144,14 @@ public class SensorController {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Sensor updated"),
             @ApiResponse(responseCode = "400", description = "Invalid input data or validation error", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Access denied", content = @Content),
             @ApiResponse(responseCode = "404", description = "Sensor not found", content = @Content),
             @ApiResponse(responseCode = "409", description = "Sensor code already exists", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
     public ResponseEntity<SensorResponseDTO> updateSensor(
             @PathVariable UUID id,
-            @Valid
-            @RequestBody
-            SensorUpdateRequestDTO dto
+            @Valid @RequestBody SensorUpdateRequestDTO dto
     ) {
         SensorResponseDTO sensor = sensorService.updateSensor(id, dto);
         return ResponseEntity.ok(sensorModelAssembler.toModel(sensor));
@@ -160,6 +162,7 @@ public class SensorController {
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "Sensor deleted"),
             @ApiResponse(responseCode = "400", description = "Invalid UUID format", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Access denied", content = @Content),
             @ApiResponse(responseCode = "404", description = "Sensor not found", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
