@@ -29,6 +29,7 @@ public class SensorReadingResponseDTO extends RepresentationModel<SensorReadingR
     private BigDecimal soilPh;
     private BigDecimal lightIntensity;
     private UUID sensorId;
+    private UUID fieldId;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -45,6 +46,7 @@ public class SensorReadingResponseDTO extends RepresentationModel<SensorReadingR
                 .soilPh(reading.getSoilPh())
                 .lightIntensity(reading.getLightIntensity())
                 .sensorId(reading.getSensor() != null ? reading.getSensor().getId() : null)
+                .fieldId(reading.getSensor().getField().getId())
                 .createdAt(reading.getCreatedAt())
                 .updatedAt(reading.getUpdatedAt())
                 .build();
