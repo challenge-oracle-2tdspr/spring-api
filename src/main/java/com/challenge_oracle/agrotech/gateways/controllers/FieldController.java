@@ -19,6 +19,7 @@ import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -33,28 +34,30 @@ public class FieldController {
     private final FieldModelAssembler fieldModelAssembler;
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
     @Operation(summary = "Create new field")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "Field created"),
             @ApiResponse(responseCode = "400", description = "Invalid input data", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Access denied", content = @Content),
             @ApiResponse(responseCode = "404", description = "Property not found", content = @Content),
             @ApiResponse(responseCode = "409", description = "Field title already exists for this property", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
     public ResponseEntity<FieldResponseDTO> createField(
-            @Valid
-            @RequestBody
-            FieldCreateRequestDTO dto
+            @Valid @RequestBody FieldCreateRequestDTO dto
     ) {
         FieldResponseDTO field = fieldService.createField(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(fieldModelAssembler.toModel(field));
     }
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'USER')")
     @Operation(summary = "Fetch all fields with pagination")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Fields fetched"),
             @ApiResponse(responseCode = "400", description = "Invalid pagination parameters", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Access denied", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
     public ResponseEntity<PagedModel<FieldResponseDTO>> getAllFields(
@@ -64,16 +67,17 @@ public class FieldController {
     ) {
         Pageable pageable = PageRequest.of(page, size);
         Page<FieldResponseDTO> fields = fieldService.getAllFields(pageable);
-
         PagedModel<FieldResponseDTO> pagedModel = pagedAssembler.toModel(fields, fieldModelAssembler);
         return ResponseEntity.ok(pagedModel);
     }
 
     @GetMapping("/property/{propertyId}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'USER')")
     @Operation(summary = "Fetch all fields from a property")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Fields fetched"),
             @ApiResponse(responseCode = "400", description = "Invalid pagination parameters", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Access denied", content = @Content),
             @ApiResponse(responseCode = "404", description = "Property not found", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
@@ -85,16 +89,17 @@ public class FieldController {
     ) {
         Pageable pageable = PageRequest.of(page, size);
         Page<FieldResponseDTO> fields = fieldService.getFieldsByProperty(propertyId, pageable);
-
         PagedModel<FieldResponseDTO> pagedModel = pagedAssembler.toModel(fields, fieldModelAssembler);
         return ResponseEntity.ok(pagedModel);
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'USER')")
     @Operation(summary = "Fetch one field by its id")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Field fetched"),
             @ApiResponse(responseCode = "400", description = "Invalid UUID format", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Access denied", content = @Content),
             @ApiResponse(responseCode = "404", description = "Field not found", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
@@ -104,29 +109,31 @@ public class FieldController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
     @Operation(summary = "Update field")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Field updated"),
             @ApiResponse(responseCode = "400", description = "Invalid input data or validation error", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Access denied", content = @Content),
             @ApiResponse(responseCode = "404", description = "Field not found", content = @Content),
             @ApiResponse(responseCode = "409", description = "Field title already exists for this property", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
     public ResponseEntity<FieldResponseDTO> updateField(
             @PathVariable UUID id,
-            @Valid
-            @RequestBody
-            FieldUpdateRequestDTO dto
+            @Valid @RequestBody FieldUpdateRequestDTO dto
     ) {
         FieldResponseDTO field = fieldService.updateField(id, dto);
         return ResponseEntity.ok(fieldModelAssembler.toModel(field));
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Delete field")
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "Field deleted"),
             @ApiResponse(responseCode = "400", description = "Invalid UUID format", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Access denied", content = @Content),
             @ApiResponse(responseCode = "404", description = "Field not found", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
