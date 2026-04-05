@@ -20,6 +20,7 @@ import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -34,27 +35,29 @@ public class HarvestController {
     private final HarvestModelAssembler harvestModelAssembler;
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
     @Operation(summary = "Create new harvest")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "Harvest created"),
             @ApiResponse(responseCode = "400", description = "Invalid input data", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Access denied", content = @Content),
             @ApiResponse(responseCode = "404", description = "Field not found", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
     public ResponseEntity<HarvestResponseDTO> createHarvest(
-            @Valid
-            @RequestBody
-            HarvestCreateRequestDTO dto
+            @Valid @RequestBody HarvestCreateRequestDTO dto
     ) {
         HarvestResponseDTO harvest = harvestService.createHarvest(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(harvestModelAssembler.toModel(harvest));
     }
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'USER')")
     @Operation(summary = "Fetch all harvests with pagination")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Harvests fetched"),
             @ApiResponse(responseCode = "400", description = "Invalid pagination parameters", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Access denied", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
     public ResponseEntity<PagedModel<HarvestResponseDTO>> getAllHarvests(
@@ -64,16 +67,17 @@ public class HarvestController {
     ) {
         Pageable pageable = PageRequest.of(page, size);
         Page<HarvestResponseDTO> harvests = harvestService.getAllHarvests(pageable);
-
         PagedModel<HarvestResponseDTO> pagedModel = pagedAssembler.toModel(harvests, harvestModelAssembler);
         return ResponseEntity.ok(pagedModel);
     }
 
     @GetMapping("/field/{fieldId}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'USER')")
     @Operation(summary = "Fetch all harvests from a field")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Harvests fetched"),
             @ApiResponse(responseCode = "400", description = "Invalid pagination parameters", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Access denied", content = @Content),
             @ApiResponse(responseCode = "404", description = "Field not found", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
@@ -85,16 +89,17 @@ public class HarvestController {
     ) {
         Pageable pageable = PageRequest.of(page, size);
         Page<HarvestResponseDTO> harvests = harvestService.getHarvestsByField(fieldId, pageable);
-
         PagedModel<HarvestResponseDTO> pagedModel = pagedAssembler.toModel(harvests, harvestModelAssembler);
         return ResponseEntity.ok(pagedModel);
     }
 
     @GetMapping("/status/{status}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'USER')")
     @Operation(summary = "Fetch harvests by status")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Harvests fetched"),
             @ApiResponse(responseCode = "400", description = "Invalid status or pagination parameters", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Access denied", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
     public ResponseEntity<PagedModel<HarvestResponseDTO>> getHarvestsByStatus(
@@ -105,16 +110,17 @@ public class HarvestController {
     ) {
         Pageable pageable = PageRequest.of(page, size);
         Page<HarvestResponseDTO> harvests = harvestService.getHarvestsByStatus(status, pageable);
-
         PagedModel<HarvestResponseDTO> pagedModel = pagedAssembler.toModel(harvests, harvestModelAssembler);
         return ResponseEntity.ok(pagedModel);
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'USER')")
     @Operation(summary = "Fetch one harvest by its id")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Harvest fetched"),
             @ApiResponse(responseCode = "400", description = "Invalid UUID format", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Access denied", content = @Content),
             @ApiResponse(responseCode = "404", description = "Harvest not found", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
@@ -124,28 +130,30 @@ public class HarvestController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
     @Operation(summary = "Update harvest")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Harvest updated"),
             @ApiResponse(responseCode = "400", description = "Invalid input data or validation error", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Access denied", content = @Content),
             @ApiResponse(responseCode = "404", description = "Harvest not found", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
     public ResponseEntity<HarvestResponseDTO> updateHarvest(
             @PathVariable UUID id,
-            @Valid
-            @RequestBody
-            HarvestUpdateRequestDTO dto
+            @Valid @RequestBody HarvestUpdateRequestDTO dto
     ) {
         HarvestResponseDTO harvest = harvestService.updateHarvest(id, dto);
         return ResponseEntity.ok(harvestModelAssembler.toModel(harvest));
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Delete harvest")
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "Harvest deleted"),
             @ApiResponse(responseCode = "400", description = "Invalid UUID format", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Access denied", content = @Content),
             @ApiResponse(responseCode = "404", description = "Harvest not found", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
