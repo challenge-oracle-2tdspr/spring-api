@@ -8,6 +8,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 @FeignClient(name = "sensor", url = "${services.apex.sensor}")
 public interface SensorClient {
 
-    @PostMapping("/create")
+    @PostMapping("/sensors/create")
     void createApexSensor(@RequestBody SensorResponseDTO sensor);
 }
