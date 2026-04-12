@@ -10,8 +10,8 @@ import java.security.interfaces.RSAPublicKey;
 @Component
 public class RsaKeyProperties {
 
-    private RSAPublicKey publicKey;
-    private RSAPrivateKey privateKey;
+    private final RSAPublicKey publicKey;
+    private final RSAPrivateKey privateKey;
 
     public RsaKeyProperties() {
         KeyPair keyPair = generateRsaKey();

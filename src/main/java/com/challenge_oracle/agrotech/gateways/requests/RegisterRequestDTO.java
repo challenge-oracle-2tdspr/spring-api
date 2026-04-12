@@ -25,7 +25,10 @@ public class RegisterRequestDTO {
     private String lastName;
     private String phoneNumber;
 
+    private Role role = Role.USER;
+
     public User toUser(String encodedPassword) {
+        Role resolvedRole = (role == Role.USER || role == Role.MANAGER) ? role : Role.USER;
         return User.builder()
                 .email(this.email)
                 .password(encodedPassword)
@@ -33,7 +36,7 @@ public class RegisterRequestDTO {
                 .firstName(this.firstName)
                 .lastName(this.lastName)
                 .phoneNumber(this.phoneNumber)
-                .role(Role.USER)
+                .role(resolvedRole)
                 .build();
     }
 }

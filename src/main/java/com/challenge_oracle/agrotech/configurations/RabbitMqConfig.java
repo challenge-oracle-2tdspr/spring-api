@@ -1,31 +1,55 @@
 package com.challenge_oracle.agrotech.configurations;
 
 import org.springframework.amqp.core.*;
+import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
+import org.springframework.amqp.rabbit.connection.ConnectionFactory;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
-import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class RabbitMqConfig {
 
+    public static final String EXCHANGE = "sensor.exchange";
+    public static final String READING_QUEUE = "sensor.reading.queue";
+    public static final String READING_ROUTING = "sensor.reading";
+
     @Bean
-    public Queue sensorQueue() {
-        return QueueBuilder.durable("sensor-readings").build();
+    public TopicExchange sensorExchange() {
+        return new TopicExchange(EXCHANGE, true, false);
     }
 
     @Bean
-    public Exchange sensorExchange() {
-        return ExchangeBuilder.directExchange("sensor-readings").durable(true).build();
+    public Queue sensorReadingQueue() {
+        return QueueBuilder.durable(READING_QUEUE).build();
     }
 
     @Bean
-    public Binding sensorBinding(Queue sensorQueue, Exchange sensorExchange) {
-        return BindingBuilder.bind(sensorQueue).to(sensorExchange).with("sensor-reading-rk").noargs();
+    public Binding sensorReadingBinding() {
+        return BindingBuilder.bind(sensorReadingQueue())
+                .to(sensorExchange())
+                .with(READING_ROUTING);
     }
 
     @Bean
-    public MessageConverter messageConverter() {
+    public Jackson2JsonMessageConverter messageConverter() {
         return new Jackson2JsonMessageConverter();
+    }
+
+    @Bean
+    public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory) {
+        RabbitTemplate template = new RabbitTemplate(connectionFactory);
+        template.setMessageConverter(messageConverter());
+        return template;
+    }
+
+    @Bean
+    public SimpleRabbitListenerContainerFactory rabbitListenerContainerFactory(
+            ConnectionFactory connectionFactory) {
+        SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
+        factory.setConnectionFactory(connectionFactory);
+        factory.setMessageConverter(messageConverter());
+        return factory;
     }
 }

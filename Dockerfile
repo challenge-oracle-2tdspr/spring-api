@@ -4,7 +4,6 @@ WORKDIR /build
 
 COPY mvnw .
 COPY .mvn .mvn
-
 COPY pom.xml .
 RUN ./mvnw dependency:go-offline -B
 
@@ -34,11 +33,13 @@ RUN addgroup -S agrotech && \
 
 WORKDIR /opt/agrotech
 
-COPY --from=builder /build/target/*.jar app.jar
+COPY --from=builder /build/target/extracted/dependencies/ ./
+COPY --from=builder /build/target/extracted/spring-boot-loader/ ./
+COPY --from=builder /build/target/extracted/snapshot-dependencies/ ./
+COPY --from=builder /build/target/extracted/application/ ./
 
 RUN chown -R agrotech:agrotech /opt/agrotech && \
-    chmod 500 /opt/agrotech && \
-    chmod 400 /opt/agrotech/app.jar
+    chmod 500 /opt/agrotech
 
 USER agrotech
 
@@ -58,5 +59,5 @@ ENTRYPOINT ["java", \
     "-XX:+OptimizeStringConcat", \
     "-Djava.security.egd=file:/dev/./urandom", \
     "-Dspring.profiles.active=prod", \
-    "-jar", \
-    "app.jar"]
+    "-cp", "BOOT-INF/classes:BOOT-INF/lib/*", \
+    "org.springframework.boot.loader.launch.JarLauncher"]
