@@ -5,13 +5,10 @@ WORKDIR /build
 COPY mvnw .
 COPY .mvn .mvn
 COPY pom.xml .
-RUN ./mvnw dependency:go-offline -B
+RUN chmod +x mvnw && ./mvnw dependency:go-offline -B
 
 COPY src ./src
 RUN ./mvnw clean package -DskipTests -B
-
-RUN mkdir -p target/extracted && \
-    java -Djarmode=layertools -jar target/*.jar extract --destination target/extracted
 
 FROM eclipse-temurin:21-jre-alpine
 
@@ -33,31 +30,14 @@ RUN addgroup -S agrotech && \
 
 WORKDIR /opt/agrotech
 
-COPY --from=builder /build/target/extracted/dependencies/ ./
-COPY --from=builder /build/target/extracted/spring-boot-loader/ ./
-COPY --from=builder /build/target/extracted/snapshot-dependencies/ ./
-COPY --from=builder /build/target/extracted/application/ ./
+COPY --from=builder /build/target/*.jar app.jar
 
-RUN chown -R agrotech:agrotech /opt/agrotech && \
-    chmod 500 /opt/agrotech
+RUN chown -R agrotech:agrotech /opt/agrotech
 
 USER agrotech
 
-HEALTHCHECK --interval=30s \
-            --timeout=3s \
-            --start-period=60s \
-            --retries=3 \
-    CMD wget --quiet --tries=1 --spider http://localhost:${SERVER_PORT:-8080}/actuator/health || exit 1
+HEALTHCHECK --interval=30s --timeout=3s --start-period=60s --retries=3 CMD wget --quiet --tries=1 --spider http://localhost:${SERVER_PORT:-8080}/actuator/health || exit 1
 
 EXPOSE 8080
 
-ENTRYPOINT ["java", \
-    "-XX:InitialRAMPercentage=70", \
-    "-XX:MaxRAMPercentage=70", \
-    "-XX:+UseG1GC", \
-    "-XX:+UseStringDeduplication", \
-    "-XX:+OptimizeStringConcat", \
-    "-Djava.security.egd=file:/dev/./urandom", \
-    "-Dspring.profiles.active=prod", \
-    "-cp", "BOOT-INF/classes:BOOT-INF/lib/*", \
-    "org.springframework.boot.loader.launch.JarLauncher"]
+ENTRYPOINT ["java", "-XX:InitialRAMPercentage=70", "-XX:MaxRAMPercentage=70", "-XX:+UseG1GC", "-XX:+UseStringDeduplication", "-XX:+OptimizeStringConcat", "-Djava.security.egd=file:/dev/./urandom", "-Dspring.profiles.active=prod", "-jar", "app.jar"]
