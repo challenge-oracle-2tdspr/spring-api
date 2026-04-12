@@ -1,6 +1,7 @@
 package com.challenge_oracle.agrotech.gateways.controllers;
 
 import com.challenge_oracle.agrotech.assemblers.SensorModelAssembler;
+import com.challenge_oracle.agrotech.clients.SensorClient;
 import com.challenge_oracle.agrotech.enums.SensorStatus;
 import com.challenge_oracle.agrotech.gateways.requests.SensorCreateRequestDTO;
 import com.challenge_oracle.agrotech.gateways.requests.SensorUpdateRequestDTO;
@@ -34,6 +35,7 @@ public class SensorController {
 
     private final SensorService sensorService;
     private final SensorModelAssembler sensorModelAssembler;
+    private final SensorClient sensorClient;
 
     @PostMapping
     @Operation(summary = "Create new sensor")
@@ -49,6 +51,8 @@ public class SensorController {
             @Valid @RequestBody SensorCreateRequestDTO dto
     ) {
         SensorResponseDTO sensor = sensorService.createSensor(dto);
+        sensorClient.createApexSensor(sensor);
+
         return ResponseEntity.status(HttpStatus.CREATED).body(sensorModelAssembler.toModel(sensor));
     }
 
