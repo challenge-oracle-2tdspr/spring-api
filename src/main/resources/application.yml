@@ -87,7 +87,7 @@ logging:
 services:
   apex:
     field: www.teste.com
-    sensor: http://localhost:8081/sensors
+    sensor: ${SENSOR_API_URL}
     sensor-reading: www.teste.com
 
 webhook:
