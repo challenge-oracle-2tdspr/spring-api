@@ -26,12 +26,7 @@ services:
       SPRINGDOC_API_DOCS_ENABLED: "false"
       SPRINGDOC_SWAGGER_UI_ENABLED: "false"
       SPRING_CLOUD_OPENFEIGN_LAZY_ATTRIBUTES_RESOLUTION: "true"
-      JAVA_TOOL_OPTIONS: >-
-        -XX:InitialRAMPercentage=25
-        -XX:MaxRAMPercentage=50
-        -XX:MaxMetaspaceSize=96m
-        -XX:+UseSerialGC
-        -XX:ActiveProcessorCount=1
+      JAVA_TOOL_OPTIONS: "-XX:InitialRAMPercentage=18 -XX:MaxRAMPercentage=38 -XX:MaxMetaspaceSize=192m -XX:+UseSerialGC -XX:ActiveProcessorCount=1"
 
     ports:
       - "8080:8080"
