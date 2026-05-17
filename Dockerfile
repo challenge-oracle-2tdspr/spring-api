@@ -16,10 +16,7 @@ LABEL maintainer="agrotech-team" \
       description="AgroTech API - Spring Boot Production" \
       version="1.0"
 
-RUN apk update --no-cache && \
-    apk upgrade --no-cache && \
-    apk add --no-cache curl wget ca-certificates tzdata && \
-    rm -rf /var/cache/apk/*
+RUN apk add --no-cache wget ca-certificates tzdata
 
 ENV TZ=America/Sao_Paulo
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
@@ -36,8 +33,6 @@ RUN chown -R agrotech:agrotech /opt/agrotech
 
 USER agrotech
 
-HEALTHCHECK --interval=30s --timeout=3s --start-period=60s --retries=3 CMD wget --quiet --tries=1 --spider http://localhost:${SERVER_PORT:-8080}/actuator/health || exit 1
-
 EXPOSE 8080
 
-ENTRYPOINT ["java", "-XX:InitialRAMPercentage=70", "-XX:MaxRAMPercentage=70", "-XX:+UseG1GC", "-XX:+UseStringDeduplication", "-XX:+OptimizeStringConcat", "-Djava.security.egd=file:/dev/./urandom", "-Dspring.profiles.active=prod", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-Djava.security.egd=file:/dev/./urandom", "-Dspring.profiles.active=prod", "-jar", "app.jar"]

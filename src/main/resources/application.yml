@@ -19,11 +19,11 @@ spring:
     baseline-version: 1
 
     hikari:
-      maximum-pool-size: ${DB_POOL_SIZE:10}
-      minimum-idle: 2
-      idle-timeout: 300000
-      connection-timeout: 30000
-      max-lifetime: 1800000
+      maximum-pool-size: 5
+      minimum-idle: 1
+      idle-timeout: 60000
+      connection-timeout: 20000
+      max-lifetime: 600000
       pool-name: AgroTechOracleCP
 
   rabbitmq:
@@ -41,6 +41,8 @@ spring:
           max-attempts: 3
           multiplier: 2.0
           max-interval: 10000
+        concurrency: 1
+        max-concurrency: 2
     template:
       mandatory: true
 
@@ -51,7 +53,7 @@ spring:
           default:
             connect-timeout: 5000
             read-timeout: 10000
-            logger-level: BASIC
+            logger-level: NONE
       circuitbreaker:
         enabled: true
 
@@ -65,10 +67,10 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.OracleDialect
-        format_sql: true
-        show_sql: ${SHOW_SQL:true}
+        format_sql: false
+        show_sql: false
         use_sql_comments: true
-    show-sql: ${SHOW_SQL:true}
+    show-sql: false
     open-in-view: false
 
   jackson:
@@ -81,8 +83,8 @@ server:
 
 logging:
   level:
-    org.hibernate.SQL: ${LOG_SQL:DEBUG}
-    com.challengeoracle.agrotech: DEBUG
+    org.hibernate.SQL: WARN
+    com.challengeoracle.agrotech: WARN
 
 services:
   apex:
