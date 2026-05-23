@@ -1,0 +1,44 @@
+trigger:
+  - main
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+  - group: nome-do-seu-variable-group
+  - name: mavenPOMFile
+    value: pom.xml
+
+steps:
+  - task: JavaToolInstaller@0
+    displayName: Use Java 21
+    inputs:
+      versionSpec: '21'
+      jdkArchitectureOption: 'x64'
+      jdkSourceOption: 'PreInstalled'
+
+  - task: Maven@3
+    displayName: Maven
+    inputs:
+      mavenPomFile: '$(mavenPOMFile)'
+      goals: 'clean verify'
+      testRunTitle: 'tests'
+      javaHomeOption: 'JDKVersion'
+      jdkVersionOption: '1.21'
+      jdkArchitectureOption: 'x64'
+    env:
+      DATABASE_URL: $(DATABASE_URL)
+      DATABASE_USERNAME: $(DATABASE_USERNAME)
+      DATABASE_PASSWORD: $(DATABASE_PASSWORD)
+      DB_POOL_SIZE: $(DB_POOL_SIZE)
+      DDL_AUTO: $(DDL_AUTO)
+      SHOW_SQL: $(SHOW_SQL)
+      LOG_SQL: $(LOG_SQL)
+      RABBITMQ_HOST: $(RABBITMQ_HOST)
+      RABBITMQ_PORT: $(RABBITMQ_PORT)
+      RABBITMQ_USERNAME: $(RABBITMQ_USERNAME)
+      RABBITMQ_PASSWORD: $(RABBITMQ_PASSWORD)
+      RABBITMQ_VHOST: $(RABBITMQ_VHOST)
+      SENSOR_API_URL: $(SENSOR_API_URL)
+      JWT_SECRET: $(JWT_SECRET)
+      SENSOR_WEBHOOK_API_KEY: $(SENSOR_WEBHOOK_API_KEY)

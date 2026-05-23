@@ -23,25 +23,32 @@ services:
       JWT_SECRET: ${JWT_SECRET}
       SENSOR_WEBHOOK_API_KEY: ${SENSOR_WEBHOOK_API_KEY}
       SERVER_PORT: 8080
+
       SPRINGDOC_API_DOCS_ENABLED: "false"
       SPRINGDOC_SWAGGER_UI_ENABLED: "false"
       SPRING_CLOUD_OPENFEIGN_LAZY_ATTRIBUTES_RESOLUTION: "true"
+
+      MANAGEMENT_ENDPOINT_HEALTH_PROBES_ENABLED: "true"
+      MANAGEMENT_HEALTH_LIVENESSSTATE_ENABLED: "true"
+      MANAGEMENT_HEALTH_READINESSSTATE_ENABLED: "true"
+      MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: "health,info"
+      MANAGEMENT_HEALTH_RABBIT_ENABLED: "false"
+
+      SPRING_JPA_OPEN_IN_VIEW: "false"
+
       JAVA_TOOL_OPTIONS: "-XX:InitialRAMPercentage=18 -XX:MaxRAMPercentage=38 -XX:MaxMetaspaceSize=192m -XX:+UseSerialGC -XX:ActiveProcessorCount=1"
 
     ports:
       - "8080:8080"
     restart: unless-stopped
+
+    mem_limit: 550m
+    mem_reservation: 256m
+    cpus: "1.0"
+
     healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8080/actuator/health"]
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8080/actuator/health/liveness"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 90s
-    deploy:
-      resources:
-        limits:
-          cpus: '1.0'
-          memory: 550M
-        reservations:
-          cpus: '0.25'
-          memory: 256M
