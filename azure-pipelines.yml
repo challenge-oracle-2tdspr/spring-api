@@ -6,26 +6,12 @@ pool:
 
 variables:
   - group: agrotech-variables
-  - name: mavenPOMFile
-    value: pom.xml
 
 steps:
-  - task: JavaToolInstaller@0
-    displayName: Use Java 21
-    inputs:
-      versionSpec: '21'
-      jdkArchitectureOption: 'x64'
-      jdkSourceOption: 'PreInstalled'
-
-  - task: Maven@3
-    displayName: Maven
-    inputs:
-      mavenPomFile: '$(mavenPOMFile)'
-      goals: 'clean verify'
-      testRunTitle: 'tests'
-      javaHomeOption: 'JDKVersion'
-      jdkVersionOption: '1.21'
-      jdkArchitectureOption: 'x64'
+  - script: |
+      docker compose -f docker-compose.prod.yml config
+      docker compose -f docker-compose.prod.yml up --build -d
+    displayName: Subir via docker compose
     env:
       DATABASE_URL: $(DATABASE_URL)
       DATABASE_USERNAME: $(DATABASE_USERNAME)
