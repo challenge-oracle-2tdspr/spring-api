@@ -5,7 +5,7 @@ pool:
   vmImage: ubuntu-latest
 
 variables:
-  - group: nome-do-seu-variable-group
+  - group: agrotech-variables
   - name: mavenPOMFile
     value: pom.xml
 
