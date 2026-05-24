@@ -8,9 +8,20 @@ variables:
   - group: agrotech-variables
 
 steps:
+  - checkout: self
+
   - script: |
+      echo "Running on self-hosted VM"
+      whoami
+      hostname
+      docker --version
+      docker compose version
       docker compose -f docker-compose.prod.yml config
+      docker compose -f docker-compose.prod.yml down --remove-orphans || true
+      docker rm -f agrotech_api || true
       docker compose -f docker-compose.prod.yml up --build -d
+      docker compose -f docker-compose.prod.yml ps
+      docker logs agrotech_api --tail 100 || true
     displayName: Deploy API
     env:
       DATABASE_URL: $(DATABASE_URL)
