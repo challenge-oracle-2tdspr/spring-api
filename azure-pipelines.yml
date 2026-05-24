@@ -2,7 +2,7 @@ trigger:
   - main
 
 pool:
-  vmImage: ubuntu-latest
+  name: agrotech-pool
 
 variables:
   - group: agrotech-variables
@@ -11,7 +11,7 @@ steps:
   - script: |
       docker compose -f docker-compose.prod.yml config
       docker compose -f docker-compose.prod.yml up --build -d
-    displayName: Subir via docker compose
+    displayName: Deploy API
     env:
       DATABASE_URL: $(DATABASE_URL)
       DATABASE_USERNAME: $(DATABASE_USERNAME)
